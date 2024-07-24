@@ -1,0 +1,252 @@
+[2024. 03. 17]
+
+[Telnet/SSH 구축]
+
+01. 프로그램 설치
+> 서버 : OpenSSH
+> 클라이언트 : ssh
+> 데몬 : sshd
+
+02. 환경 설정 파일
+> /etc/ssh/sshd_config
+
+03. 클라이언트에서 접속
+#ssh -l [사용자명] [호스트명 /IP주소/ 도메인]
+
+#ssh -l root 192.168.10.50 -p 2002
+
+#ifconfig
+#ping 8.8.8.8
+
+#systemctl stop firewalld
+#systemctl disable firewalld
+#grubby --update-kernel ALL selinux=0
+================================================
+
+
+================================================
+[ipv4]
+method=auto //부팅시 자동으로 네트워크 활성화
+address1=192.168.213.50(호스트 주소)/24(서브넷 마스크-네트워크 /박서방네),192.168.10.2(게이트웨이)
+//박서방네(=edit>virtual network>subnetIP , subnet mask)
+dns=8.8.8.8;
+
+================================================
+[복습-고정ip,서버구축]
+[root@localhost ssh]# history
+    1  ifconfig   //
+    2  cd /etc/NetworkManager/
+    3  cd system-connections/
+    4  vi ens160.nmconnection 
+    5  ping 8.8.8.8
+    6  clear
+    7  vi ens160.nmconnection 
+    8  systemctl  restart  NetworkManager
+    9  ping 8.8.8.8
+   10  reboot
+   11  ifconfig
+   12  systemctl restart NetworkManager
+   13  cd /etc/NetworkManager/
+   14  cd system-connections/
+   15  ping 8.8.8.8
+   16  vi ens160.nmconnection 
+   17  ping 8.8.8.8
+   18  clear
+   19  vi ens160.nmconnection 
+   20  systemctl restart NetworkManager
+   21  ping 8.8.8.8
+   22  ping 192.168.213.100
+   23  clear
+   24  ping 8.8.8.8
+   25  ping 192.168.213.100
+   26  systemctl status NetworkManager //현재 상태 괜찮은지
+   27  clear
+   28  cd /etc/ssh //ssh폴더로 이동
+   29  pwd
+   30  ll
+   31  vi sshd_config  //ssh_d config 파일 수정하기 > #port 2002
+   32  systemctl restart sshd
+   33  reboot
+   34  systemctl  status firewalld  //현재 방화벽 상태 확인
+   35  systemctl status sshd //현재 sshd 상태 확인
+   36  vi sshd_config //ssh_config 
+   37  cd /etc/ssh
+   38  vi sshd_config
+   39  reboot
+   40  systemctl stop firewalld
+   41  grubby --update-kernel ALL --args --selinux=0
+   42  systemctl start sshd
+   43  systemctl status sshd
+   44  ps -aux|grep sshd
+   45  kill -9 2995
+   46  ps -aux|grep sshd
+   47  cd /etc/ssh
+   48  vi sshd_config
+   49  clear
+   50  history
+
+
+================================================
+[ 텔넷 클라이언트 실행시키기 ]
+시작>설정>앱>프로그램및기능 > 좌측 windows 기능 켜기/끄기
+>맨 아랫단 텔넷 클라이언트 체크 > 확인
+
+여기선 windows : 클라이언트  / 리눅스 50,100 : 서버
+
+//웹서버 실행해보기
+yum -y install httpd* //웹서버 설치
+systemctl restart httpd
+인터넷에 192.168.213.50으로 열어지면 성공!
+
+================================================
+[xinet 운영 방식]
+
+01. 프로그램 설치
+#yum -y (무조건) install xinetd
+//로키리눅스9.3에서는 안됨!!!!!! PASS....CENTOS7에서는 된다고 함
+
+================================================
+[NFS 서버 구축]
+network file system
+
+01.  프로그램 설치
+> 서버 : nfs*
+> 데몬 : nfs-server
+
+//1. nfs 모든 패키지 다운로드
+#yum -y install nfs*
+//2. nfs 재시작하기
+# systemctl restart nfs-server
+//3. nfs 상태 확인
+# systemctl status  nfs-server
+----------------------------------------------------------------------
+02. 환경 설정 파일
+> /etc/exports
+
+//1. etc로 이동 
+#cd /etc
+//2. exports 빈파일열기
+#vi /etc/exports  
+//3. 공유할 디렉터리 내용 추가해주기
+/nfs 탭  *(rw,sync)  
+
+//4. 무슨 내용이냐면..
+[공유할 디렉터리] [접근 허용 클라이언트][옵션(rw,sync)]
+       /nfs 탭               *                         (rw,sync)
+* : 모든 호스트(클라이언트) 허용
+> 192.168.10.100(rw,sync)
+> 192.168.10.100-200(rw,sync)
+> 192.168.10.*(rw,sync)
+> 192.168.*.*(rw,sync)
+rw : 읽고 쓰게 해준다
+sync : 자동으로 실행
+
+----------------------------------------------------------------------
+03. 클라이언트에서 접속
+#mount -t [파일시스템 종류] [서버 ip 주소]:[서버의 공유 디렉터리]
+[마운트 포인트]
+# mount -t nfs 192.168.213.50:/nfs /mnt
+
+----------------------------------------------------------------------
+04. 실습 : nfs를 활용하여 서버와 클라이언트 마운트 원격 공유하기
+******방화벽 자동 비활성화 해둬야 된다.********
+//클라이언트 역할 : server100 ,서버 역할 : server50 이라고 할 때
+
+//1. 서버역할인 server 50 창에 nfs 파일 설치하기
+#yum -y install nfs*
+
+//2. nfs 재시작하기
+# systemctl restart nfs-server
+
+//3. nfs 상태 확인
+# systemctl status  nfs-server
+
+//4. 환경 설정 파일 설정해주기
+#cd /etc
+#vi /etc/exports
+/nfs 탭  *(rw,sync)   <- 내용 추가
+
+//4. 서버역할인 server50에 공유해볼 디렉터리와 파일 만들기
+# cd /
+# mkdir nfs
+# ll
+# chmod 777 nfs
+# cd nfs
+# mkdir dir1 dir2
+# touch file1.txt file2.txt
+# ll
+
+//5. 클라이언트 역할인 server100창에서 mount 해보기
+# mount -t nfs 192.168.213.50:/nfs /mnt
+
+//6. 클라이언트 역할인 server100창에서 server50의 내용들이 
+접근되는지 확인
+#cd /mnt
+# ll
+
+//7. 서버역할인 server50에서 파일 지우거나 만들면 똑같이
+클라이언트역할인 server100에서도 지워지고 만들어지는 것을 볼 수 있음
+
+-----------------------------------------------------------
+윈도우에서 리눅스 서버를 MOUNT 해보기
+
+1> 윈도우 클라이언트에서 접속
+
+//1. nfs 패키지 설치
+[  NFS 실행시키기 ]
+시작>설정>앱>프로그램및기능 > 좌측 windows 기능 켜기/끄기
+>NFS 활성화 > 내부 파일 2개도 활성화 > CMD창에서 mount로 확인
+
+//2. 마운트 하기
+//cmd창에서는 #대신 c:임
+>\mount [리눅스 nfs 서버 IP주소] : [공유 디렉터리]*[드라이브]
+>mount 192.168.213.100:/nfs2 * (띄우고 별임)
+--> z: 현재 192.168.213.100:/nfs2에 성공적으로 연결됐다고 뜸
+
+//3. 정해진 드라이버로 들어가서 서버자원 있는지 확인하기
+c:z:
+c:dir
+-----------------------------------------------------------------
+리눅스에서 윈도우 서버를 MOUNT 해보기
+
+//1. 윈도우 c드라이브에 윈도우에 파일만들기
+winnfs 폴더 > 텍스트파일2개 생성
+
+//2. winnfs 폴더의 속성 설정하기
+> winnfs 폴더 > 속성 > 공유 > '공유거부됨'이라면>공유>
+Everyone 선택 > 사용권한수준:읽기/쓰기>공유
+>폴더가 공유되었습니다 확인 후 완료
+>닫고 > 네트워크 및 공유센터 > 
+게스트 또는 공용과 모든 네트워크에 있는 항목 모두 켜기!
+다만, 모든네트워크 내부의 암호 보호 공유는 끄기
+
+//3. 방화벽
+바탕화면 우측하단에 모니터 아이콘 = 네트워크
+네트워크 > windows 방화벽
+> 도메인,개인,공용 네트워크 모두 방화벽 끄기
+
+//4. cmd창에서 윈도우 계정 생성
+> net user root 123456 /add
+
+//5. ip확인
+>cmd창에 ipconfig로 192.168.213.201 인지 확인
+[root@localhost home]# mount -t cifs //192.168.213.201/winnfs /home/winnfs
+
+//6. 클라이언트인 리눅스에서 마운트 해보기
+mount -t cifs //192.168.213.2/winnfs /home/winnfs -o username=root,password=123456
+>>ip확인한거랑 생성했던 윈도우 id, psswd 그대로 넣기
+
+//7. 디렉터리 나갔다 다시 확인하러 들어오면 sync 되는것을 볼 수 있음
+
+
+
+
+
+
+
+
+
+
+
+
+

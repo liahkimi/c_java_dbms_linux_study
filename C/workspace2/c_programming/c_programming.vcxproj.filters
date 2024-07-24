@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\day01">
+      <UniqueIdentifier>{0fbdd1e9-62b8-48d5-8e9e-798b93661bc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day02">
+      <UniqueIdentifier>{8efdd7e6-507b-477a-b3e8-53619747b8a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day03">
+      <UniqueIdentifier>{e61c0737-77ad-4ac8-b3bd-b10cdbeb327a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day04">
+      <UniqueIdentifier>{a16d75ff-badc-4c3c-8466-ea070cdd2865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day05">
+      <UniqueIdentifier>{da4547b2-f260-42f3-9749-53a37b694e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day06">
+      <UniqueIdentifier>{c7497fa0-a92c-4f14-97fb-c052133629a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day07">
+      <UniqueIdentifier>{441fab46-4e47-43a5-93ca-2048ce92defd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day08">
+      <UniqueIdentifier>{7cfa2abf-b137-426d-9997-4eec1f1ca50f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day09">
+      <UniqueIdentifier>{fae388f5-7ae3-4ca0-8934-2371f9ac08d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\day10">
+      <UniqueIdentifier>{4713eef2-3a9d-476a-a041-83506ae9e772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\practice">
+      <UniqueIdentifier>{afb986cf-9e71-41a0-a2e5-68624cf936b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="1_print1.c">
+      <Filter>소스 파일\day01</Filter>
+    </ClCompile>
+    <ClCompile Include="1_variable.c">
+      <Filter>소스 파일\day02</Filter>
+    </ClCompile>
+    <ClCompile Include="2_escape.c">
+      <Filter>소스 파일\day02</Filter>
+    </ClCompile>
+    <ClCompile Include="3_scan.c">
+      <Filter>소스 파일\day02</Filter>
+    </ClCompile>
+    <ClCompile Include="4_scanTask.c">
+      <Filter>소스 파일\day02</Filter>
+    </ClCompile>
+    <ClCompile Include="1_casting.c">
+      <Filter>소스 파일\day03</Filter>
+    </ClCompile>
+    <ClCompile Include="2_castingTask.c">
+      <Filter>소스 파일\day03</Filter>
+    </ClCompile>
+    <ClCompile Include="3_oper.c">
+      <Filter>소스 파일\day03</Filter>
+    </ClCompile>
+    <ClCompile Include="4_if.c">
+      <Filter>소스 파일\day03</Filter>
+    </ClCompile>
+    <ClCompile Include="1_if.c">
+      <Filter>소스 파일\day04</Filter>
+    </ClCompile>
+    <ClCompile Include="2_ifTask.c">
+      <Filter>소스 파일\day04</Filter>
+    </ClCompile>
+    <ClCompile Include="3_switch.c">
+      <Filter>소스 파일\day04</Filter>
+    </ClCompile>
+    <ClCompile Include="1_oper.c">
+      <Filter>소스 파일\day05</Filter>
+    </ClCompile>
+    <ClCompile Include="2_for.c">
+      <Filter>소스 파일\day05</Filter>
+    </ClCompile>
+    <ClCompile Include="3_for.c">
+      <Filter>소스 파일\day05</Filter>
+    </ClCompile>
+    <ClCompile Include="1_forTask.c">
+      <Filter>소스 파일\day06</Filter>
+    </ClCompile>
+    <ClCompile Include="2_while.c">
+      <Filter>소스 파일\day06</Filter>
+    </ClCompile>
+    <ClCompile Include="3_rand.c">
+      <Filter>소스 파일\day06</Filter>
+    </ClCompile>
+    <ClCompile Include="4_game.c">
+      <Filter>소스 파일\day06</Filter>
+    </ClCompile>
+    <ClCompile Include="1_array1.c">
+      <Filter>소스 파일\day07</Filter>
+    </ClCompile>
+    <ClCompile Include="2_array2.c">
+      <Filter>소스 파일\day07</Filter>
+    </ClCompile>
+    <ClCompile Include="3_c_array.c">
+      <Filter>소스 파일\day07</Filter>
+    </ClCompile>
+    <ClCompile Include="4_c_arrayTask.c">
+      <Filter>소스 파일\day07</Filter>
+    </ClCompile>
+    <ClCompile Include="5_string.c">
+      <Filter>소스 파일\day07</Filter>
+    </ClCompile>
+    <ClCompile Include="1_pointer.c">
+      <Filter>소스 파일\day08</Filter>
+    </ClCompile>
+    <ClCompile Include="2_const.c">
+      <Filter>소스 파일\day08</Filter>
+    </ClCompile>
+    <ClCompile Include="3_string.c">
+      <Filter>소스 파일\day08</Filter>
+    </ClCompile>
+    <ClCompile Include="4_array_ptr.c">
+      <Filter>소스 파일\day08</Filter>
+    </ClCompile>
+    <ClCompile Include="5_two_array.c">
+      <Filter>소스 파일\day08</Filter>
+    </ClCompile>
+    <ClCompile Include="6_func.c">
+      <Filter>소스 파일\day08</Filter>
+    </ClCompile>
+    <ClCompile Include="1_func.c">
+      <Filter>소스 파일\day09</Filter>
+    </ClCompile>
+    <ClCompile Include="2_funcTask.c">
+      <Filter>소스 파일\day09</Filter>
+    </ClCompile>
+    <ClCompile Include="3_lifecycle.c">
+      <Filter>소스 파일\day09</Filter>
+    </ClCompile>
+    <ClCompile Include="4_call.c">
+      <Filter>소스 파일\day09</Filter>
+    </ClCompile>
+    <ClCompile Include="5_task1.c">
+      <Filter>소스 파일\day09</Filter>
+    </ClCompile>
+    <ClCompile Include="6_task2.c">
+      <Filter>소스 파일\day09</Filter>
+    </ClCompile>
+    <ClCompile Include="1_task.c">
+      <Filter>소스 파일\day10</Filter>
+    </ClCompile>
+    <ClCompile Include="2_struct.c">
+      <Filter>소스 파일\day10</Filter>
+    </ClCompile>
+    <ClCompile Include="3_structArray.c">
+      <Filter>소스 파일\day10</Filter>
+    </ClCompile>
+    <ClCompile Include="4_dynamic.c">
+      <Filter>소스 파일\day10</Filter>
+    </ClCompile>
+    <ClCompile Include="game.c">
+      <Filter>소스 파일\practice</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

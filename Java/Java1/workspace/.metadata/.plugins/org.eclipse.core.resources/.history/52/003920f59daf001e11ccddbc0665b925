@@ -1,0 +1,103 @@
+package day05;
+
+import java.util.Scanner;
+
+public class Review {
+
+	public static void main(String[] args) {
+
+		// 실습1. for문을 사용해서 아래와 같이 출력결과가 나오도록 코드를 작성하기
+
+		// 1 짝수 3 짝수 5 짝수 7 짝수 9 짝수
+		// 11 짝수 13 짝수 15 짝수 17 짝수 19 짝수
+		// 21 짝수 23 짝수 25 짝수 27 짝수 29 짝수
+		// 31 짝수 33 짝수 35 짝수 37 짝수 39 짝수
+		// 41 짝수 43 짝수 45 짝수 47 짝수 49 짝수
+
+		// 1. 1~50까지의 정수를 출력한다(단, 짝수일 경우는 "짝수" 문자열, 홀수일 경우는 정수로 출력)
+		// 2. 10단위로 줄바꿈을 사용해야 한다 -> 10의 배수일 경우에는 줄바꿈을 사용한다
+		// 3. 10단위의 정수가 아닐경우에는 줄바꿈을 하지 않으며 일정 간격을 띄워서 출력한다
+		
+		
+		for(i=0; i<=50; i++) {
+			if(i%2==0){
+				System.out.println("짝수");
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+		for (int i = 1; i <= 50; i++) {
+
+			if (i % 2 == 0) {
+				System.out.print("짝수\t");
+			} else {
+				System.out.print(i + "\t");
+			}
+
+			if (i % 10 == 0) {
+				System.out.println();
+			}
+
+		}
+
+		for (int i = 1; i <= 50; i++) {
+
+			if (i % 10 == 0) {
+				System.out.println("짝수\t");
+			} else if (i % 2 == 0) {
+				System.out.print("짝수\t");
+			} else {
+				System.out.print(i + "\t");
+			}
+		}
+
+		// 실습5.
+		// 0부터 사용자가 입력한 정수까지 이어붙여서 출력하기
+		// 만약 정수가 홀수일 경우에는 숫자 뒤에 !를 붙여서 출력한다
+
+		// 결과예시 : 정수를 입력하세요 >> 10
+		// 01!23!45!67!89!10
+
+		Scanner sc = new Scanner(System.in);
+		// 사용자가 입력한 정수를 저장할 변수
+		int num = 0;
+
+		// 사용자에게 정수를 입력받는다
+		System.out.println("정수를 입력하세요 >> ");
+		num = sc.nextInt();
+
+		for (int i = 0; i <= num; i++) {
+			if (i % 2 != 0) {
+				System.out.print(i + "!");
+			} else {
+				System.out.print(i);
+			}
+		}
+
+		for (int i = 0; i <= num; i++) {
+			System.out.print(i);
+
+			if (i % 2 != 0) {
+				System.out.print("!");
+			}
+
+		}
+
+	}
+
+}

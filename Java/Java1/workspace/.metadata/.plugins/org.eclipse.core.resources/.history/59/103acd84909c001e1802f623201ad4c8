@@ -1,0 +1,28 @@
+package day04;
+
+public class ForTest2 {
+
+	public static void main(String[] args) {
+
+//		실습1. 1부터 50까지 출력
+		for(int i = 0; i<50; i++ ) {
+			System.out.println("i="+(i+1));
+		}
+//		실습2. 50부터 1까지 출력
+		for(int i =50; i>0; i-- ) {
+			System.out.println("i="+i);
+		}
+//		실습3. 주어진 for문을 가지고 5부터 1까지 출력
+		for(int i = 0; i <5; i++) {
+			System.out.println(5-i);
+		}
+//		실습4.
+//		1~10까지의 정수중에서 짝수만 출력하기
+		for(int i = 1; i<11; i++) {
+			if(i%2==0) {
+				System.out.println("짝수"+i);
+			}
+		}
+	}
+
+}

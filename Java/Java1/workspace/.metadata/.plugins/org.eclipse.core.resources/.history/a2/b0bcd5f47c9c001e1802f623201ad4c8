@@ -1,0 +1,14 @@
+package day04;
+
+public class IfTest2 {
+
+	public static void main(String[] args) {
+		
+//		사용자에게 나이를 입력받고, 나이에 따라 출력하기
+//		20살 미만이면 미성년자
+//		20살 이상이면 성인
+//		음수를 입력시 잘못된 입력이라고 알려주기
+
+	}
+
+}

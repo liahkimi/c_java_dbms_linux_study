@@ -1,0 +1,21 @@
+package day04;
+
+public class ForTest2 {
+
+	public static void main(String[] args) {
+
+//		실습1. 1부터 50까지 출력
+		for(int i = 0; i<50; i++ ) {
+			System.out.println(i+1);
+		}
+//		실습2. 50부터 1까지 출력
+		for(int i =50; i>0; i-- ) {
+			System.out.println(i);
+		}
+//		실습3. 주어진 for문을 가지고 5부터 1까지 출력
+		for(int i = 0; i <5; i++) {
+			
+		}
+	}
+
+}

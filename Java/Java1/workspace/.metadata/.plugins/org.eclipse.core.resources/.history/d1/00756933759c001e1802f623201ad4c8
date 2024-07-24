@@ -1,0 +1,16 @@
+package day04;
+
+public class Operator {
+
+	public static void main(String[] args) {
+		
+//		삼항 연산자
+		int num = 27;
+		String result = num >0 ? "양수" : "음수";
+		String result2 = num > 0 ? "양수" : 
+			num == 0? "0입니다" : "음수";
+		System.out.println(result);
+
+	}
+
+}

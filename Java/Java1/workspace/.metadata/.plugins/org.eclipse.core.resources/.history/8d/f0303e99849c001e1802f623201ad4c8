@@ -1,0 +1,25 @@
+package day04;
+
+public class SwitchTest {
+
+	public static void main(String[] args) {
+
+		int num = 1;
+		switch(num) {
+//		num == 1
+		case 1:
+			System.out.println("num이 1이라면 실행할 코드");
+			break;
+//		num == 2
+		case 2:
+			System.out.println("num이 2이라면 실행할 코드");
+			break;
+//		num == 3
+		case 3:
+			System.out.println("num이 3이라면 실행할 코드");
+			break;
+		}
+		
+	}
+
+}

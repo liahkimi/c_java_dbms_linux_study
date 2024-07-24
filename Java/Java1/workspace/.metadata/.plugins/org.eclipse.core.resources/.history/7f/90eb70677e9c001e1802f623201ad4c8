@@ -1,0 +1,81 @@
+package day04;
+
+import java.util.Scanner;
+
+public class IfTest2 {
+
+	public static void main(String[] args) {
+		
+//		사용자에게 나이를 입력받고, 나이에 따라 출력하기
+//		20살 미만이면 미성년자
+//		20살 이상이면 성인
+//		음수를 입력시 잘못된 입력이라고 알려주기
+		
+//		Scanner sc = new Scanner(System.in);
+//		int age = 0;
+//		System.out.println("나이 입력 >>");
+//		age = sc.nextInt();
+//		if(age>=20) {
+//			System.out.println("성인");
+//		}else if(age>0) {
+////			0<age<20
+//			System.out.println("미성년자");
+//		}else {
+////			age <= 0
+//			System.out.println("잘못된 입력");
+//		}
+		
+		
+//		실습1.
+//		사용자에게 점수를 입력받고 등급을 출력하기
+//		최대점수 = 100, 최하점수 = 0
+//		90점 이상 : A등급
+//		80점 이상 : B등급
+//		70점 이상 : C등급
+//		60점 이상 : F등급
+//		결과예시 : 점수를 입력하세요 >> 97
+//		A등급입니다.
+		
+		Scanner sc = new Scanner(System.in);
+//		입력한 점수를 저장할 변수
+		int grade = 0;
+		System.out.println("점수를 입력하세요>>");
+		grade = sc.nextInt();
+		if(grade >= 90) {
+			System.out.println("A등급");
+		}else if(grade >=80) {
+			System.out.println("B등급");
+		}else if(grade>=70) {
+			System.out.println("C등급");
+		}else {
+			System.out.println("F등급");
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+	}
+
+}

@@ -1,0 +1,5 @@
+﻿  #define _CRT_SECURE_NO_WARNINGS.c
+  9_bst.c
+  코드를 생성하고 있습니다...
+9_bst.obj : error LNK2005: main이(가) #define _CRT_SECURE_NO_WARNINGS.obj에 이미 정의되어 있습니다.
+D:\강의자료\0900_C(new)\workspace2\data_structure\x64\Debug\data_structure.exe : fatal error LNK1169: 여러 번 정의된 기호가 있습니다.

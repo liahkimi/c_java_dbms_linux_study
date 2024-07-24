@@ -1,0 +1,1 @@
+{"resources":{"day01.sql":{"default-datasource":"oracle_thin-18dd919b6a5-23200ff331ccd2b7","default-schema":"HR"},"day02.sql":{"default-schema":"HR","default-datasource":"oracle_thin-18dd919b6a5-23200ff331ccd2b7"},"day05.sql":{"default-schema":"HR","default-datasource":"oracle_thin-18dd919b6a5-23200ff331ccd2b7"}}}

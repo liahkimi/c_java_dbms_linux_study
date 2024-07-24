@@ -1,0 +1,15 @@
+package day04;
+
+public class ForTest {
+
+	public static void main(String[] args) {
+		
+//		for문
+//		i변수의 값을 0으로 초기화하고, i가 10보다 작은동안
+//		i의 값을 1씩 증가하면서 코드를 반복실행하겠다.
+		for(int i = 0; i<10; i++) {
+			System.out.println("홍길동");
+		}
+	}
+
+}

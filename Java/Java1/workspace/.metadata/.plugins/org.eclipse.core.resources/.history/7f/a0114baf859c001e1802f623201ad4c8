@@ -1,0 +1,81 @@
+package day04;
+
+import java.util.Scanner;
+
+public class SwitchTest {
+
+	public static void main(String[] args) {
+
+		int num = 1;
+		switch(num) {
+//		num == 1
+//		num==1||num==3
+		case 1: case 3:
+			System.out.println("num이 1이라면 실행할 코드");
+			break;
+//		num == 2
+		case 2:
+			System.out.println("num이 2이라면 실행할 코드");
+			break;
+//		num == 4
+		case 4:
+			System.out.println("num이 4이라면 실행할 코드");
+			break;
+//		if문의 else 키워드와 동일
+		default:
+			System.out.println("모두 일치하지 않습니다.");
+		}
+		
+//		실습1.
+//		사용자에게 월을 입력받고, 해당되는 계절을 출력하기.
+//		12,1,2월 = 겨울
+//		3,4,5월 = 봄
+//		6,7,8월 = 여름
+//		9,10,11월 = 가을
+		
+		Scanner sc = new Scanner(System.in);
+//		사용자가 입력한 월을 저장할 변수
+		int month = 0;
+//		계절을 저장할 변수
+		String season = null;
+		System.out.println("좋아하는 달은? >>");
+		month = sc.nextInt();
+		switch(month) {
+		case 12: case 1: case 2:
+				System.out.println("겨울");
+				break;
+		case 3: case 4: case 5:
+			System.out.println("봄");
+			break;
+		case 6: case 7: case 8:
+			System.out.println("여름");
+			break;
+		case 9: case 10: case 11:
+			System.out.println("가울");
+			break;
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+
+}

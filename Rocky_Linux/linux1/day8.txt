@@ -1,0 +1,496 @@
+*패스워드는 num-lock 쪽 숫자키로 절대 설정하기 말기!
+
+[2024.03.10]
+
+[사용자 계정]
+
+01. 사용자 관련 파일 및 디렉터리
+[계정명] : [패스워드] : [UID] : [GID] : [Comment] : [사용자 홈디렉터리] : [셸]
+
+------------------------------------------------------------------------
+02. 사용자 정보 수정
+#usermod [옵션] [설정값] [계정명]
+	*usermod = usermode
+<옵션>
+-l : 계정명 변경
+-u : UID 변경
+-g : GID 변경
+-c : 설명
+-d : 홈디렉터리
+-s : 셸
+
+#usermod -c pse user7
+	*pse =packet switch equip mode
+#usermod -d /home/user7 user1
+	->user1:x:1001:1001:pse:/home/user7:/bin/csh
+#usermod -s /bin/csh user1  (cshell)
+	-> user1:x:1001:1001:pse:/home/user1:/bin/csh
+
+------------------------------------------------------------------------
+03. 패스워드 일시정지
+1) #passwd
+2) /bin/false
+3) /sbin/nologin
+
+# usermod -s /bin/false  user1
+	-> user1:x:1001:1001:pse:/home/user1:/bin/falser
+# usermod -s /sbin/nologin user1
+	user1:x:1001:1001:pse:/home/user1:/sbin/nologin
+	-> 셸을 변경시켜 로그인 못하게 함
+==>vi passwd 에디터에서 수정해서 복구시키면 됨
+
+# vi /etc/login.defs
+144 UID_MIN                  1000
+145 UID_MAX                 60000
+
+#cat /etc/passwd
+nobody:x:65534:65534:Kernel Overflow User:/:/sbin/nologin
+-> no login 인 상태 (아무도 못들어오게)
+
+------------------------------------------------------------------------
+04. /etc/shadow 파일
+[계정명] : [패스워드(암호화)] : [패스워드 변경 후 지난 일 수] : [패스워드 최소 변경일] : [최대 유효 기간] : [패스워드 만료 경고일] : [패스워드 만료되었을 때 비활성화 기간] : [계정 만료일] ::
+>#vi passwd
+ser1:$6$prEakllhN10yHNCi$eBHQxLiiP6twJvf13yaLFDS9vkxxVb.obW1H2guQl6UoOpP1wD    pdtWbT24AheZVc96gcJu0rk8/OGLRa7Bxvk0:19792:0:99999:7:::
+
+계정명 : user1
+패스워드: $6$prEakllhN10yHNCi$eBHQ
+	$6 : Hash ID($1 : MD5, $2: Blowfish, $5: SHA-256, $6: SHA -512)
+	$prEakllhN10yHNCi : 솔트값(사용자마다 랜덤값으로 나와 다다름)
+	$eBHQxLiiP6tw : salt + password = 암호화된 패스워드
+
+//패스워드의 상태 확인하는 법
+# passwd -S user1
+user1 PS 2024-03-10 0 99999 7 -1 
+(비밀번호가 설정되어있습니다, SHA512 암호화.  )
+
+//패스워드의 change age 확인하기
+# chage -l user1  //change age
+마지막으로 암호를 바꾼 날					: 3월 10, 2024
+암호 만료					:안함
+암호가 비활성화 기간					:안함
+계정 만료						:안함
+암호를 바꿀 수 있는 최소 날 수		: 0
+암호를 바꿔야 하는 최대 날 수		: 99999
+암호 만료 예고를 하는 날 수		: 7
+
+------------------------------------------------------------------------
+05. 패스워드 정보 변경
+> /etc/shadow
+
+#chage [옵션] [설정값] [계정명]
+#chage -m 10 user1
+-> 변경되는 것 : 암호를 바꿀 수 있는 최소 날 수: 10
+(# chage -l user1  로 확인하기)
+>user1은 10일 지나야 비밀번호를 변경할 수 있다.
+>콘솔창에서 passwd user1을 입력해도
+you mus wait longer ot change your password 에러가 뜸
+
+<옵션>
+-m : 패스워드 최소 변경일
+-M : 최대 유효 기간
+-W : 경고일
+-l : 비활성화 기간 (대문자 i임)
+-E : 계정 만료일
+
+콘솔창에서 passwd 바꿔보기
+>개인 계정으로는 여러가지 기호를 포함한 비번으로만 변경 가능
+>root 계정은 어떤 패스워드로든 변경 가능
+
+vi passwd에서 uid와 gid를 0으로 바꾸면?
+=> root의 권한으로 바뀌어버림
+=> 콘솔창에 uid와 gid를 0으로 바꾼 개인 계정으로 로그인 하면
+root계정으로 로그인 되는걸 볼 수 있음(root #)
+	*0 = 시스템 상에서 무한대를 의미함
+
+옵션으로  바꿔보기
+# chage -M 999 user8
+# chage -W 70 user8
+# chage -I 700 user8
+# chage -E 2024-12-31 user8
+
+//shadow
+user8:$6$g.3tYq2wIMl9NS6K$GZli0EFscbHDq9IsCukbIMbd.NSW2y02EWmKH2lralQDKBKQqlzctciDBs2/zLH80BvRTtbprHILrnHxTk06G0:19792:0:999:70:700:20088:
+
+[root@localhost etc]# chage -l user8
+마지막으로 암호를 바꾼 날					: 3월 10, 2024
+암호 만료					:12월 04, 2026
+암호가 비활성화 기간					:11월 03, 2028
+계정 만료						:12월 31, 2024
+암호를 바꿀 수 있는 최소 날 수		: 0
+암호를 바꿔야 하는 최대 날 수		: 999
+암호 만료 예고를 하는 날 수		: 70
+
+------------------------------------------------------------------------
+06. 그룹 사용자 생성/수정/삭제
+>디폴트 그룹, 일반그룹
+1) 생성
+#groupadd [그룹명]  //일반그룹 생성
+
+//#cat group
+user9:x:1004:
+>디폴트그룹 (useradd 
+
+pse:x:1005:
+>#groupadd pse 로 직접 생성한 일반그룹 pse
+(다만 중복된 그룹명을 생성 불가)
+
+2)삭제
+# groupdel pse
+>삭제됨 (cat group에서 확인가능)
+
+//디폴트그룹은 명령어로 삭제 불가
+# groupdel user9
+groupdel: 'user9' 사용자의 주요 그룹을 제거할 수 없습니다
+
+
+3) 그룹에 사용자 추가
+#susermod -G [그룹명] [사용자명]
+
+//명령어로 그룹에 유저 소속시키기
+# usermod -G study user1
+> study:x:1005:user1 (소속됨)
+
+//명령어로 하나의 유저가 여러개의 그룹에 소속시키기
+(#usermod -G dance user1
+ #usermode -G study user1 이렇게 하게 되면
+user1이 dance그룹에 들어갔다가 나온 뒤 study 그룹에 들어가게 됨.)
+# usermod -G dance,study user1
+
+//vi에디터에 직접 그룹에 유저 소속시키기
+60 study:x:1005:user1, user2
+
+4) 그룹 폐쇄시키기
+# groupdel study
+//study:x:1005:user2,user1,user3,user4
+=> 모두 사라짐
+
+4-1) 다른 방법으로 그룹에 사용자 추가
+#gpasswd -a [사용자명] [그룹]
+>한번에 여러그룹 소속시키기 불가
+
+# gpasswd -a user4 user3
+> user3:x:1004:user4
+# gpasswd -a user3 dance
+>dance:x:1009:user4,user3
+
+4-2) 그룹에서 사용자 삭제
+#gpasswd -d [사용자명] [그룹]
+# gpasswd -d user3 dance
+>dance그룹에서 user3 삭제 됨
+>한번에 여러 사용자 삭제 불가
+
+------------------------------------------------------------------------
+07. 소유자 변경 *chown = change own
+#chown [변경할 사용자명] [변경할 대상(파일/디렉터리)]
+#chown user1 file.txt //file.txt의 소유자인 root를 user1으로 바꾸는것
+>-rw-r--r--. 1 user1  root    0  3월 10 16:19 file.txt
+
+-rw-r--r--
+>-rw //소유자인 user1은 read, write 가능???//소유자
+>r-- //group이 study인 유저들은 readonly//그룹
+>r--  //file.txt 파일 내용을 제3자는 readonly//제3자
+
+# chown root:user1 dir1 //uid, gid 한꺼번에 변경
+
+
+08. 그룹 변경 
+#chgrp [변경할 그룹명][파일/디렉터리명]
+#chgrp study file.txt //그룹은 root에서 study로 바꾸는 것
+>-rw-r--r--. 1 user1  study   0  3월 10 16:19 file.txt
+
+
+09. 허가권 (comission)
+#chmod [허가권][파일/디렉터리명]
+#chmod 777 file.txt
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+[파일유형][허가권][링크수][파일및 디렉터리의 소유자명][그룹명][파일크기][수정일][파일/디렉터명] 
+drwxr-xr-x. 2 root   root    6  3월 10 16:19 dir1 //소유자:root
+-rw-r--r--. 1 root   root    0  3월 10 16:19 file.txt
+
+[허가권]
+rwx(소유자)r-x(그룹)r-x(제3자)
+>읽기(read) =>  r : 4 (8진수 상)   symbol로는 r/ 숫자로는 4
+>쓰기(write) => w : 2 
+>실행(execute) => x : 1 
+> 읽고 쓰기 = 4 + 2 = 6
+> 읽고 쓰고 실행 모두 다 = 4 + 2 + 1 = 7 
+	=> 777
+	=> 심볼로는 rwxrwxrwx 
+
+디렉터리 최대 허가권은 777
+>읽고 쓰고 실행 모두 되는 미친 허가권
+>7(user)7(group)7(other)
+>rwx(user)rwx(group)rwx(other)
+
+
+파일은 최대 허가권이 666
+> 읽고 쓰기만 (실행권한 x)
+>666
+>rw-(user)rw-(group)rw-(other)
+
+//디렉터리의 차이
+
+//1. 직접 생성한 디렉터리의 허가권
+drwxr-xr-x. 2 root   root    6  3월 10 16:19 dir1
+>drwxr-xr-x
+
+//2. user를 생성할 때 만들어진 디렉터리의 허가권
+drwx------. 3 user1  user1  78  3월 10 15:45 user1
+>drwx------
+
+//2-1.mask : 권한을 제한,차단하다
+>umask : 0022 (universal mask) - 리눅스 전체에서의 umask값은 0022
+							( /etc/login.defs 에서 확인가능)
+	>0(특수)0(제3자)2(group)2(소유자)
+	>#umask 002  //umask값 설정해주는 법 (각기 디렉터리 및 파일마다 umask값 다름)
+
+//2-1. user생성시 만들어진 디렉터리의 제한된 허가권 구하기
+>디렉터리
+	>>777 //디렉터리의 권한
+		022 //umask의 권한
+		-------
+		= 755
+	>> 777
+	     033
+	   -------
+	     744
+		->drwxr-xr-x. 2 root   root    6  3월 10 16:28 dir2
+		   drwxr--r--. 2 root   root    6  3월 10 17:18 dir3
+
+>파일
+	> > 666
+  	       022
+	     --------
+  	       644
+	># umask 033
+	  # touch file3.txt
+
+
+* 허가권의 비트표현(2진수)과 8진수표현법
+wxr-wxr-wxr
+111111111 = 777
+
+rw-r--r--  //파일
+110100100 = 644
+
+rwxr-xr-x //디폴트 디렉터리
+111  101 101 = 755
+
+
+
+
+[디렉터리]drwxr-xr-x. 2 root   root    6  3월 10 16:19 dir1 //소유자:root
+> 읽기 : 디렉터리 내에서의 목록 출력 권한 
+	- 모든사용자는 읽기권한 있음
+	- home디렉터리에 read권한이 있어 ll명령어로 읽기 가능
+	- ls나 ll명령어로 읽을 수 있느냐 없느냐의 차이
+> 쓰기 : 디렉터리 내에서의 파일/디렉터리를  생성/수정/삭제
+	- touch나 mkdir 생성할 수 있는지 없는지
+
+> 실행 : 디렉터리의 진입 권한
+	- cd 명령어로 들어갈 수 있는지 없는지
+
+[파일]-rw-r--r--. 1 root   root    0  3월 10 16:19 file.txt
+>읽기 : 파일 내용 읽기
+>쓰기 : 파일 내용 생성(편집기로 추가)/수정/삭제 (쓰기 권한이 없으면 업로드 불가)
+>실행 : 파일 내용을 실행(script파일 만들어 실행하던거)
+
+
+[특수 비트]
+>기존에 실행 권한이 부여되어 있으면 '소문자'
+> 실행 권한이 없으면 '대문자'
+
+Sticky(1) : other의 실행(x) 권한 : t :
+	> 쓰기 권한이 부여되어 있어도 삭제만큼은 해당 파일의 소유자만 가능
+	> -rwxrwxrwx. 1 user1  study   0  3월 10 16:19 file.txt
+	> chmod 777로 생성했어도 user1만 파일 삭제 가능
+
+SetGID(2) : group의 실행 권한 : s
+	
+SetUID(4) : user의 실행 권한 : s
+	> -rwxrwxrwx. root  root   0  3월 10 16:19 file.txt
+	> 모든 권한이 있는 777권한일 때
+	> 제3자가 파일 실행 가능한데
+	> 실행하는 동안 권한이 root의 권한으로 되어버려 보안에 취약
+	> 그룹 권한이라서
+
+> 3 = sticky + setgid
+> SUID  = SetGID + SetUID
+
+
+//Sticky-bit 실습해보기!!!!!!
+//특수비트 포함 아무권한 안줄때 -12자
+# chmod 0000 dir1
+	>d--S--S---. 3 root   study  49  3월 10 18:44 dir1
+//특수비트 미포함 모든권한 줄때 - 9자
+# chmod 777 dir1
+	>drwsrwsrwx. 3 root   study  49  3월 10 18:44 dir1
+//other에 sticky-bit 줄 때 - t 추가
+//모두 다 읽고 쓸 수 있지만 삭제는 user만 가능
+# chmod o+t dir1
+	>drwsrwsrwt. 3 root   study  49  3월 10 18:44 dir1
+
+
+[root@localhost home]# find / -name passwd
+/sys/fs/selinux/class/passwd
+/sys/fs/selinux/class/passwd/perms/passwd
+/etc/pam.d/passwd
+/etc/passwd
+/usr/bin/passwd
+/usr/share/licenses/passwd
+/usr/share/doc/passwd
+/usr/share/bash-completion/completions/passwd
+[root@localhost home]# cd /usr/bin
+[root@localhost bin]# ls -l passwd
+-rwsr-xr-x. 1 root root 32656  5월 15  2022 passwd
+ ==> sticky -bit 사용 사례 
+
+[root@localhost etc]# ls -l passwd
+-rw-r--r--. 1 root root 2346  3월 10 16:06 passwd
+==> 모두 읽을 수 는 있음
+
+# pwunconv
+=> vi passwd에 암호화된 passwd 다 보임
+
+
+
+
+//유저 실습해보기
+* #su user1  //user1으로 계정 바꾸기 (기억해라..)
+
+o : 제3자
+//제3자가 dir1을 실행 못하게 하기
+# chmod o-x dir1
+	> [user1@localhost home]$ cd dir1
+		bash: cd: dir1: 허가 거부
+		//=> cd 로 디렉터리 진입 조차 불가
+
+//제3자가 dir1을 실행 할 수 있게 하기
+# chmod o+x dir1
+	//cd로 진입 가능
+
+//제3자가 dir1을 읽을 수 없게 하기
+# chmod o-r dir1
+	>[user1@localhost dir1]$ ll
+	ls: cannot open directory '.': 허가 거부
+		//-> ll명령어로 dir1 내부의 파일/디렉터리 열람 불가
+
+//제3자가 dir1을 읽을 수 있게 하기
+# chmod o+r dir1
+	//=> ll명령어 가능
+
+//제3자가 dir1을 생성/삭제/수정 할수 없게 하기
+# chmod o-w dir1
+	//생성 불가
+	>[user1@localhost dir1]$ touch ddd.txt
+	touch: cannot touch 'ddd.txt': 허가 거부
+	//삭제 불가
+	>[user1@localhost dir1]$ rm -rf ttt.txt
+	rm: cannot remove 'ttt.txt': 허가 거부
+
+//제3자가 dir1을 생성/삭제/수정 할수 있게 하기
+# chmod o+w dir1
+	> 삭제 가능
+
+[root@localhost home]# chmod o+rwx dir1
+
+
+//그룹 실습해보기2
+//유저
+# chmod u+x,g+w,o-w dir1
+
+//other는 아무것도 못하게 만들기
+# chmod 770 dir1
+>drwxrwx---. 3 root   study  34  3월 10 18:09 dir1
+
+//gid를 study로 권한 변경하기
+# chgrp study dir1
+
+//dir1의 그룹권한에 실행권한 빼기
+# chmod g-x dir1
+drwxrw----. 3 root   study  34  3월 10 18:09 dir1
+> study 그룹에 들어있는 계정도 실행 불가
+
+//dir1의 그룹권한에 실행권한 빼기
+# chmod g+x dir1
+> study 그룹에 들어있는 계정만 실행 가능
+
+//그룹에 소속시키기
+ #usermod -G study user1
+
+
+//실습3
+// 심볼에 =으로 권한주기도 가능
+
+//other에게 읽기권한은 주기
+# chmod o=r dir1
+	>drwxrw-r--. 3 root   study  34  3월 10 18:09 dir1
+
+//특수비트 실습-
+//user, other, goup에  s,s,t 특수비트 추가해
+//->모두 소문자 s s t 붙음
+# chmod u+s,g+s,o+t dir1
+	>drwsrwsrwt. 3 root   study  34  3월 10 18:09 dir1
+
+//other에게 실행권한 뺏음 
+//-> user부분 T대문자로 변경됨
+# chmod o-x dir1
+	>drwsrwsrwT. 3 root   study  34  3월 10 18:09 dir1
+	>other의 실행권한만 뺏기때문에 대문자 T
+
+//user에게 s를 추가하고, 실행권한 뺏음
+# chmod u+s,u-x dir1
+	>drwSrwsrwT. 3 root   study  34  3월 10 18:09 dir1
+
+---------------------------------------------------------------------------
+//group과 other에 쓰기 권한 없애보기 실습
+# chmod 755 dir1
+drwsr-sr-x. 3 root   study   64  3월 10 19:15 dir1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+---------------------------------------------------------------------------
+[심볼]
+> 사용자 : u
+> 그룹 : g
+>제 3자 : o
+
+> + : 권한 부여
+> - : 권한 제거
+> = : 설정/ 해당 비트만 적용
+
+#chown [사용자] . [그룹] [대상]
+#chown [사용자] : [그룹] [대상]
+#chown . [그룹] [대상]
+#chown : [그룹] [대상]
+#chown [사용자] : [대상]
+
+
+
+
+
+
+
+
+
+

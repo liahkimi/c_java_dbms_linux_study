@@ -1,0 +1,276 @@
+[2024.03.09]
+
+[LVM]
+
+[미션]
+> HDD 3개 장착
+> 장치명 : /dev/myvg/mylv
+> 파일시스템 : xfs
+> 마운트 포인트 : /home/mnt
+> 자동 마운트 : 
+-----------------------------------------------------------------------------------------
+// lv,vg지우기
+# lvremove /dev/myvg2/mylv2  > y
+# vgremove /dev/myvg2
+
+-----------------------------------------------------------------------------------------
+// Linux raid autodetect
+
+> raid 타입 설정 방법
+	#fdisk 디바이스명 > n > p (파티션 나누기) > t > FD (raid type
+
+> raid 타입이란?
+	- 분산저장
+	- 복구 능력 좋음
+	- 실무 서버에서 대부분 사용
+	- 통합하는 기술의 쌍벽 LVM & RAID
+
+>raid 0란? 
+	- 스트라이핑
+	- 여러 개의 하드 디스크를 하나의 논리적인 단일 디스크로 결합하는 기술 중 하나
+	- 데이터를 여러 디스크에 분산하여 저장할수 있게함
+	- 동시에 여러 디스크에서 데이터를 읽고 쓸 수 있으므로 전체적인 성능이 향상됨
+	- 하나의 파일을 저장할 때, 파일의 다른 부분은 각 디스크에 나누어 저장됩니다. 
+	이는 각 디스크가 병렬로 작업하여 처리할 수 있도록 해줌
+	- RAID 0는 데이터의 안정성을 향상시키는 데 사용되지 않으며,주로 성능을 향상시키는 데 사용
+	- 단점 :  하나의 디스크가 고장 나면 해당 데이터의 일부 또는 전체가 손실될 수 있음
+
+-----------------------------------------------------------------------------------------
+[RAID LEVEL : 0 ] = STRIPING
+//1. 파티션 나누고 RAID타입으로 바꾸기
+#fdisk 디바이스명 > n > p (파티션 나누기) > t > FD (raid type
+
+// 2. STRIPING 하기 (LEVEL: 0)
+# mdadm --create /dev/md0 --level=0 --raid-devices=2  /dev/nvme0n2p1 /dev/nvme0n3p1
+
+// 3. mdadm detail 보기
+# mdadm --detail /dev/md0
+
+// 4. 파일시스템 생성
+# mkfs.xfs /dev/md0
+
+// 5. 마운트 하기
+# mount /dev/md0 /mnt
+
+// 6. 	마운트한 raid 디스크에 passwd파일을 복붙해두고 망가트려보면 
+	마운트가 안되는것을 알 수 있음
+
+	cd /mnt
+	cp /etc/passwd . //데이터 무결성 테스트
+	init 0
+	mount /dev/md0 /mnt //mount: /mnt: special device /dev/md0 does not exist.
+
+-----------------------------------------------------------------------------------------
+[RAID LEVEL : 1 ] = MIRRORING 복구능력 있음 
+<=리눅스 9.3에서 에러남
+
+# mdadm --create /dev/md1 --level=1 --raid-devices=2  /dev/nvme0n3p1 /dev/nvme0n4p1
+// md1이라는 RAID장치 이름으로 RAID 레벨을 1로 설정하여 미러링 수행시키기
+
+
+-----------------------------------------------------------------------------------------
+[RAID LEVEL : 5 ] =
+# mdadm --create /dev/md5 --level=5 --raid-devices=3  /dev/nvme0n3p1  /dev/nvme0n4p1  /dev/nvme0n5p1
+페리티 = 무결성 점검 비트 
+페리티를 저장하는 디스크가 있어야 함
+
+# mkfs.xfs /dev/md5
+
+# mount /dev/md5 /mnt
+
+RAID LEVEL : 3 부터는 디스크가 3개 이상이여야 함
+RAID LEVEL : 5 부터는 디스크가 3개 이상이여야 함(HDD 1개만)
+RAID LEVEL : 6 부터는 디스크가 4개 이상이여야 함(HDD 2개만)
+2개 고장나도 복구가능하게 끔 하기 위해서
+
+RAID-0+1   = RAID0로 묶은 두묶음을 RAID1으로 묶은 것
+		= RAID1 (RAID0 + RAID0)
+		-> level01 devices:2 /dev/md0 /dev/md1
+RAID-1+0
+
+
+==================================================
+
+[ 사용자 관리 ]
+
+01. 사용자 생성 / 수정 / 삭제
+#useradd [옵션] [설정값] [생성할 계정명]
+#useradd user1 //user1 계정 생성
+#passwd user1 //user1의 passwd 변경
+
+----------------------------------------------------------------------------------------
+02. 계정 생성 시 관련 파일 및 디렉터리
+1) /etc/passwd <- 사용자 일반 정보 저장하는 파일
+[계정명]:[패스워드]:[UID]:[GID]:[Comment]:[사용자홈디렉터리]:[셸 종류]
+user2:x:1002:1002::/home/user2:/bin/bash
+
+2) /etc/shadow <- 사용자의 패스워드 정보 저장하는 파일(암호화된 패스워드)
+3) /etc/group <- 그룹 정보 저장하는 파일
+4) /var/mail <-사용자의 메일 저장하는 파일
+5) /home/user1 <-user1이라는 사용자의 홈디렉터리
+
+=> 계정을 새로 생성할 때마다 이 5가지의 파일들에 영향이 감
+	계정에 이상이 생기면, 이 5개의 파일 확인하여 복구해야 함
+
+root - 관리자 계정
+시스템 계정 
+libstoragemgmt:x:990:990:daemon account for libstoragemgmt:/:/usr/sbin/nologin
+systemd-oom:x:989:989:systemd Userspace OOM Killer:/:/usr/sbin/nologin
+tss:x:59:59:Account used for TPM access:/:/usr/sbin/nologin
+geoclue:x:988:987:User for geoclue:/var/lib/geoclue:/sbin/nologin
+cockpit-ws:x:987:986:User for cockpit web service:/nonexisting:/sbin/nologin
+cockpit-wsinstance:x:986:985:User for cockpit-ws instances:/nonexisting:/sbin/nologin
+flatpak:x:985:984:User for flatpak system helper:/:/sbin/nologin
+colord:x:984:983:User for colord:/var/lib/colord:/sbin/nologin
+clevis:x:983:982:Clevis Decryption Framework unprivileged user:/var/cache/clevis:/usr/sbin/nologin
+setroubleshoot:x:982:981:SELinux troubleshoot server:/var/lib/setroubleshoot:/usr/sbin/nologin
+gdm:x:42:42::/var/lib/gdm:/sbin/nologin
+gnome-initial-setup:x:981:980::/run/gnome-initial-setup/:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/usr/share/empty.sshd:/sbin/nologin
+chrony:x:980:979:chrony system user:/var/lib/chrony:/sbin/nologin
+dnsmasq:x:979:978:Dnsmasq DHCP and DNS server:/var/lib/dnsmasq:/usr/sbin/nologin
+tcpdump:x:72:72::/:/sbin/nologin
+
+일반계정은 UID가 1000번부터 시작
+test:x:1000:1000:test:/home/test:/bin/bash
+user1:x:1001:1001::/home/user1:/bin/bash
+user2:x:1002:1002::/home/user2:/bin/bash
+
+ 
+# cat /etc/passwd
+cat으로 파일들 열어 확인해보기!
+
+
+>>참조 파일 : /etc/login.defs
+----------------------------------------------------------------------------------------
+03. 패스워드 변경
+#passwd [변경할 계정명]
+#passwd user1 //user1의 passwd 변경
+아이디 새로 생성한 뒤 passwd 꼭 변경해줘야 함
+
+CTRL+alt+F5 > usr1으로 로그인
+CTRL+alt+F2 빠져나오기
+
+----------------------------------------------------------------------------------------
+04. 사용자 전환
+#su [전환할 계정명]
+#su test //test 계정으로 변경
+#su user1
+substitute user가 아님  switch user임.
+
+
+
+
+-----------------------------------------------------------------------------------------
+
+05-1. 계정 삭제
+#userdel [옵션] user5
+#userdel -r user5  //완전히 삭제되어 5개의 모든 파일 및 디렉터리에서 삭제됨
+
+05-2.//다만, -r 옵션 없이 삭제시
+#userdel user5
+//5가지 파일중 몇가지 파일은 남아있게 되어 완전히 삭제되는건 아니다.
+//passwd, shadow에서는 삭제됨
+//home에는 그대로 존재
+
+05-3. vi 에디터로 계정을 삭제했을 경우에는,
+1) /etc/passwd <- 사용자 일반 정보 저장하는 파일
+2) /etc/shadow <- 사용자의 패스워드 정보 저장하는 파일(암호화된 패스워드)
+3) /etc/group <- 그룹 정보 저장하는 파일
+4) /var/mail <- 사용자의 메일 저장하는 파일
+5) /home/user1
+=> 이 5가지 파일을 찾아다니면서 확인 및 삭제해줘야 완전히 삭제된다.
+
+--------------------------------------------------------------------------------------
+05-4. vi에디터로 user10 직접 생성하고 로그인  해보기
+
+vi passwd => uid gid를 가장 높은값으로 새로 매겨줘야 함, 새파일 지정도
+vi shadow에서도 id 맞춰야 함.
+//home에서 디렉터리 생성시
+mkdir 해준 뒤
+cd /etc/skel
+ls -al
+.bash_logout, .bash_profile, .bashrc 카피해줘야함
+cp -rf .ba* /home/user11
+cd /home/user11
+소유권과 허가권 바꿔주기
+chown user11.user11 .bas*  [root => user11로 변경됨]
+cd /var/mail/
+touch user11
+chown user11.user11 user11 //소유권
+
+=> 로그인 테스트
+
+
+
+**일반 사용자 계정으로 passwd 파일을 수정할 수 없다.
+**일반 사용자 계정으로 copy도 할 수 없다.
+**passwd파일은 누구나 볼수있는 파일이라 민감한 정보는 shadow파일에
+-------------------------------------------------------------------------------------=
+06. 계정과 copy와 소유권과그룹명의 관계
+
+//user11.txt의 소유권은 user11에게 있다고 할 때,
+//root계정으로 cp를 진행한다면
+
+//1. cp에 옵션 없이 진행하면
+#cp  user11.txt user13.txt
+//=> 소유자와 그룹명이 root로 카피됨
+
+//2.하지만, cp에 a옵션을 추가해서 진행하면
+cp -a user11.txt user13.txt
+-a 옵션을 주면  원래 소유권인 user11이 그대로 유지됨
+
+
+-------------------------------------------------------------------------------------
+07. 사용자의 접근 일시 정지시키기 (로그인 일시 정지. 막아두기)
+#passwd [옵션] [중단시킬 계정명]
+
+<옵션>
+-l  : lock  패스워드 잠금
+-u : unlock 패스워드 잠금 해제
+[root@localhost user1]# passwd -l user1
+user1 사용자의 비밀 번호를 잠급니다
+passwd: 성공
+
+
+//현재 패스워드 어떻게 설정되어있는지 볼때
+# passwd -S user1
+user1 PS 2024-03-09 0 99999 7 -1 (비밀번호가 설정되어있습니다, SHA512 암호화.  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

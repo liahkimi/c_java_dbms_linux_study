@@ -1,0 +1,125 @@
+day10. TCL, DCL, 함수
+
+TCL(Transaction Control Language)
+
+	트랜잭션 제어어
+
+	1. COMMIT : 모든 작업(트랜잭션)을 확정(데이터베이스에 반영)한다 -> 영구저장
+	2. ROLLBACK : 트랜잭션에서 수행한 작업을 취소하고, 작업이 수행되기 이전 상태로 되돌린다. 
+	-> 마지막 COMMIT 완료시점으로 돌아간다
+	4. SAVEPOINT : 롤백 지점을 설정(특정 지점을 지정할수 있다)
+	5. DDL은 쿼리 실행시 AUTO COMMIT이 실행된다(ROLLBACK 불가)
+
+트랜잭션(Transaction)
+
+	데이터베이스의 하나의 작업 단위(논리적 연산단위)
+	하나의 트랙잭션 안에는 1개 이상의 쿼리가 포함된다
+
+	ex) 계좌이체 작업
+	출금 계좌에서 돈을 출금 작업 + 입금 계좌에서 돈을 입금 작업
+	하나의 작업에서 문제가 생길 경우 2개의 작업이 모두 취소되어야 한다. 
+	그러므로 하나의 트랜잭션으로 2개의 작업을 묶어서 사용한다
+
+
+트랜잭션의 ACID 속성
+	- 원자성(Atomicity) : 모두 실행하거나 모두 취소한다(All or Nothing)
+	- 일관성(consistency) : 트랜잭션 작업 전후로 데이터베이스는 일관된 상태를 유지한다
+	- 고립성(isolation) : 여러 트랜잭션이 동시에 실행될때 각 트랜잭션은 다른 트랜잭션에서 
+	수행중인 작업을 방해하지 말아야한다 
+	- 지속성(durability) : 트랙잭션 작업이 수행되면 그 결과는 영구 저장되어야 한다
+
+TRUNCATE, DELETE, DROP
+
+	1. DROP
+		- DDL
+		- 테이블 삭제
+		- ROLLBACK 불가
+	
+	2. DELETE
+		- DML
+		- 테이블의 데이터 삭제
+		- ROLLBACK 가능
+	
+	3. TRUNCATE
+		- DDL
+		- 테이블의 모든 데이터 삭제
+		- ROLLBACK 불가
+
+
+DCL(Data Control Language)
+
+	데이터베이스 사용자와 권한 관리와 관련된 작업
+	권한 (SELECT, INSERT, UPDATE, DELETE, ALTER .. )
+
+	1. GRANT : 권한 부여
+		GRANT 권한 ON 테이블명 TO 계정명;
+
+	2. REVOKE : 권한 회수(삭제)
+		REVOKE 권한 ON 테이블명 FROM 계정명;
+
+	3. 계정 생성
+		CREATE USER 계정이름 IDENTIFIED BY 비밀번호;
+		단, 연결된 계정이 새로운 계정을 생성할수 있는 권한을 가지고 있는 상태여야 한다
+
+	4. 계정 삭제
+		DROP USER 계정 이름;
+	
+	5. 현재 계정의 권한 확인
+		SELECT * FROM USER_TAB_PRIVS_RECD;
+
+	6. 현재 계정이 부여한 권한 확인
+		SELECT * FROM USER_TAB_PRIVS_MADE;
+
+	7. 특정 계정에 부여된 권한 확인
+		SELECT GRANTEE, PRIVILEGE FROM DBA_SYS_PRIVS
+		WHERE GRANTEE = '계정명';
+
+	8. 특정 계정에 부여된 롤(역활) 확인
+		SELECT * FROM DBA_ROLE_PRIVS WHERE GRANTEE = '계정명';
+
+	10. 특정 롤(역활)에 부여된 권한 확인
+		SELECT * FROM DBA_SYS_PRIVS WHERE GRANTEE = '롤이름';		
+
+문자열 함수
+
+	1. LOWER : 문자의 소문자 반환
+	2. UPPER : 문자의 대문자 반환
+	3. CONCAT : 문자1과 문자2를 연결한다(|| 연산자와 동일)
+	4. SUBSTR : 문자에서 m위치부터 n개의 문자길이만큼 자른다. n생략시 마지막문자까지
+	5. LENGTH : 문자의 글자 개수를 정수값으로 반환한다
+	6. TRIM : 문자의 왼쪽, 오른쪽 공백 제거
+
+숫자 함수
+
+	1. ABS : 절대값
+	2. CEIL : 올림
+	3. FLOOR : 내림
+	4. ROUND : 반올림
+	5. TRUNC : 소수 m자리에서 잘라서 버림
+
+날짜 함수
+
+	1. SYSDATE : 현재 날짜와 시각
+	2. EXTRACT : 날짜에서 원하는 요소 추출
+
+
+형변환 함수
+
+	1. 자동 형변환(암시적 형변환) : 데이터베이스가 자동으로 형변환
+	2. 강제 형변환(명시적 형변환) : 직접 명시하여 형변환
+
+	1. TO_NUMBER(문자열) : 문자열 -> 숫자
+	2. TO_CHAR(숫자 또는 날짜) : 숫자 또는 날짜 -> 문자열
+	3. TO_DATE(문자열) : 문자열 -> 날짜
+
+
+집합 연산자
+
+	UNION은 JOIN처럼 두 테이블을 같이 조회할 때 사용한다.
+	JOIN은 두 테이블을 좌우방향으로 합치고 UNION은 위아래방향으로 합친다. 
+	UNION은 반드시 열의 수와 타입이 동일해야 한다.
+
+
+	1. UNION : 합집합(중복 제거)
+	2. UNION ALL : 합집합(중복 포함)
+	3. INTERSECT : 교집합(중복 제거)

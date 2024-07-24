@@ -1,0 +1,547 @@
+[2024.02.24]
+
+01. 디렉터리 생성/수정/삭제
+#mkdir dir{1..10} //dir1~dir10 한번에 10개 생성
+#rm -rf dir{1..10} //dir1~dir10 한번에 10개 삭제
+
+#mv 
+>파일/디렉터리 옮기기
+>파일/디렉터리 이름 변경
+--> 생성되어 있지 않는 파일/디렉터리로 옮기면 이름변경되는것처럼 보이고
+--> 생성되어있는 파일/디렉터리로 옮기면 옮겨지는 것임
+
+==================================================
+02. 파일 생성/수정/삭제
+#touch file{1..10} //file1~file10 한번에 10개 생성
+#rm -rf file{1..10} //file1~file10 한번에 10개 삭제
+#rm -rf [a-c]* //a~c로 시작되는 모든 파일/디렉처리 삭제
+#rm -rf [bc]* //b,c로 시작되는 모든 파일/디렉처리 삭제
+#rm -rf [^a-c]* //a,b,c로 시작되는 파일만 제외하고, 나머지 모두 삭제
+#rm -rf [!bc]* //b,c로 시작되는 파일만 제외하고 나머지 모두 삭제
+
+==================================================
+03. 파일/디렉처리명 변경
+#mv
+#rename [변경할 범위][변경할 이름][파일/디렉터명]
+#reaname file data- file1 //file이라는 파일을 data-1으로 파일명 변경
+#rename file1 data- file1 //file1이라는 파일을 data-로 파일명 변경
+#rename file data- file* //file이 포함된 파일명들을 data-1,data-2등으로 일괄 변경
+# rename file file- file* //file이포함된 파일명들을 file-로 일괄 파일명 변경
+
+# rename .txt .bak f* //확장자 한번에 변경하기(사실 리눅스에는 확장자개념 없지만)
+				//문자 ".txt"를 ".bak"으로 변경
+-rw-r--r--. 1 root root 0  2월 24 15:30 f1.txt
+-rw-r--r--. 1 root root 0  2월 24 15:30 f2.txt
+-rw-r--r--. 1 root root 0  2월 24 15:30 f3.txt
+[root@localhost korea]# rename .txt .bak f*
+[root@localhost korea]# ll
+
+-rw-r--r--. 1 root root 0  2월 24 15:30 f1.bak
+-rw-r--r--. 1 root root 0  2월 24 15:30 f2.bak
+-rw-r--r--. 1 root root 0  2월 24 15:30 f3.bak
+
+# touch file{1..10}.txt //한번에 .txt확장자로 file1~10까지 생성
+
+
+==================================================
+04. 파일/ 디렉처리 수정 시간 변경
+#touch [파일/디렉터리] <-- 현재시간으로  변경(파일/디렉터리가 존재할 때)
+	# touch -t 2312310000 f1.bak
+
+#touch [파일] <-- 파일/디렉터리가 존재하지 않을 때 빈 파일 생성
+
+#touch -t 2402241400 [파일/디렉터리] //24년2월24일14시로 파일 생성 or 시간변경
+
+==================================================
+05. 행, 단어, 문자 수 출력
+
+#wc  (word count)
+
+#wc [옵션] [파일명]
+#wc passwd
+#wc -l passwd //
+
+<옵션>
+-l : 행 수
+-w : 단어 수
+-c : 문자 수
+> 행, 단어, 문자 수 순서로 출력
+
+# head -n 5 passwd | tee  passwd8 
+//passwd의 윗단의  5줄을(-n은 줄수) passwd8에 저장해줌
+
+>tee란? 화면에도 출력하고, 파일에도 저장해주는 명령어
+
+==================================================
+06. 파일 유형 출력
+#file [파일명] //어떤 타입의 파일인지 알 수 있음
+
+[root@localhost korea]# file d1
+d1: directory //d1파일은 directory
+
+#cd /bin  //기본명령어 보기
+
+[root@localhost dev]# file sr0  
+sr0: block special (11/0)   //기본 명령어 내부의 sr0명령어의 의미 알아낼 수 있음
+   
+==================================================
+07.문자를 잘라서 가져오기/출력
+#cut [옵션....] [파일명]
+
+[root@localhost korea]# cut -c 1 passwd7
+r
+b
+d
+a
+l
+
+#cut -c 1-2 passwd7
+
+<옵션>
+-c : 문자 단위 출력
+-f : 필드 단위 출력 (필드:열)
+-d : 구분자(필드를 나눔)
+
+vi text.txt //text.txt이름의 파일 vi로 만들기
+다 쓰고 esc->:wq //파일 저장
+
+현재 text.txt의 vi 파일
+linux		unix		windows
+windows	linux		unix
+
+
+//text.txt의 필드1만 cut
+[root@localhost korea]# cut -f 1 text.txt
+linux
+windows
+
+//필드1과2를 cut
+[root@localhost korea]# cut -f 1-2 text.txt
+linux	unix
+windows	linux
+
+//i를 기준으로 cut
+[root@localhost korea]# cut -f 1 -di text.txt
+l
+w
+
+
+-------------------------------------
+: 콜론 옵션 
+//passwd7의 필드1의 모습
+[root@localhost korea]# cut -f 1 passwd7
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+
+//:를 기준으로 출력
+[root@localhost korea]# cut -f 1 -d: passwd7 
+root
+bin
+daemon
+adm
+lp
+[root
+
+ //passwd7 윗단 5줄 모습
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+
+//1번째 필드1,과 필드3 을 :로 구분해서 cut한 것
+# cut -f1,3  -d: passwd7
+[root@localhost korea]# cut -f1,3  -d: passwd7
+root:0
+bin:1
+daemon:2
+adm:3
+lp:4
+
+
+==================================================
+08. 문자를 잘라서 가져오기/출력
+#awk [옵션]........{정규식}.......[파일명]
+
+#awk '{print $1}' awk.txt
+#awk -F, '{print $1}' awk.txt  // 쉼표 안보이게
+#awk -F: '{print $1}' awk.txt // 콜론 안보이게
+
+
+
+//$1, $2, $3(정규식)으로 편하게 필드 출력가능
+[root@localhost ~]# awk '{print $1}' awk.txt
+name
+lss
+ggc
+hgd
+ghd
+[root@localhost ~]# awk '{print $1, $2}' awk.txt
+name age
+lss 100
+ggc 95
+hgd 90
+ghd 50
+[root@localhost ~]# awk '{print $1, $2,$3}' awk.txt
+name age addr
+lss 100 seoul
+ggc 95 daejeon
+hgd 90 daegu
+ghd 50 busan
+
+
+
+//  ,쉼표 있던걸 안보이게 하기 (-F,)
+[root@localhost ~]# awk -F, '{print $1, $2,$1, $3}' awk.txt
+name age name addr
+lss 100 lss seoul
+ggc 95 ggc daejeon
+hgd 90 hgd daegu
+ghd 50 ghd busan
+
+// :콜론 있던걸 안보이게 하기 (-F:)
+[root@localhost ~]# awk -F: '{print $2, $1, $3}' awk.txt
+age name addr
+100 lss seoul
+95 ggc daejeon
+90 hgd daegu
+50 ghd busan
+
+
+//활용
+[root@localhost ~]# awk -F: '{print  $1, $3}' awk.txt | tee awk2.txt
+name addr
+lss seoul
+ggc daejeon
+hgd daegu
+ghd busan
+[root@localhost ~]# cat awk2.txt
+name addr
+lss seoul
+ggc daejeon
+hgd daegu
+ghd busan
+
+
+//
+[root@localhost korea]# awk -F: '{print  $1, $3}' passwd  | tee awk3.txt
+root 0
+bin 1
+daemon 2
+adm 3
+lp 4
+sync 5
+shutdown 6
+halt 7
+mail 8
+
+//정규화 "\t" 넣어 띄어 쓰기 적용
+[root@localhost korea]# awk -F: '{print  $1,"\t" $3}' passwd  | tee awk3.txt
+root 	0
+bin 	1
+daemon 	2
+adm 	3
+lp 	4
+sync 	5
+
+==================================================
+09. 파일/디렉터리 목록 출력
+#ls [옵션]
+
+<옵션>
+-a : 모든 파일/디렉터리 출력(숨김파일까지)(all)
+-A : 모든 파일/디렉터리 출력('.', '..' 제외한 숨김파일까지)
+-ㅣ : 자세히 출력(long)
+-h : human-readable
+-F : 파일 유형( * : 실행파일, / : 디렉터리, @ : 링크파일, = : 소켓파일)
+-R : 하위 디렉터리 목록 출력
+-S : 파일 크기 순으로 출력
+-r : 역순으로 출력
+-t : 생성 시간 순으로 출력
+
+
+
+
+[root@localhost korea]# ls -a
+.  ..  dir1  dir2  dir3  dir4  dir5  file1  file2  file3  file4  file5
+// . , ..가 숨김파일
+
+//숨김파일 만들기 .
+[root@localhost korea]# touch .file6
+[root@localhost korea]# mkdir .dir6
+//안보임
+[root@localhost korea]# ls
+dir1  dir2  dir3  dir4  dir5  file1  file2  file3  file4  file5
+//보임
+[root@localhost korea]# ls -a
+.  ..  .dir6  .file6  dir1  dir2  dir3  dir4  dir5  file1  file2  file3  file4  file5
+[root@localhost korea]# 
+
+
+
+//숨김파일은 다 보이나, 상위숨김파일 안보임
+[root@localhost korea]# ls -Al
+합계 0
+drwxr-xr-x. 2 root root 6  2월 24 18:33 .dir6
+-rw-r--r--. 1 root root 0  2월 24 18:33 .file6
+drwxr-xr-x. 2 root root 6  2월 24 18:31 dir1
+drwxr-xr-x. 2 root root 6  2월 24 18:31 dir2
+drwxr-xr-x. 2 root root 6  2월 24 18:31 dir3
+drwxr-xr-x. 2 root root 6  2월 24 18:31 dir4
+drwxr-xr-x. 2 root root 6  2월 24 18:31 dir5
+-rw-r--r--. 1 root root 0  2월 24 18:31 file1
+-rw-r--r--. 1 root root 0  2월 24 18:31 file2
+-rw-r--r--. 1 root root 0  2월 24 18:31 file3
+-rw-r--r--. 1 root root 0  2월 24 18:31 file4
+-rw-r--r--. 1 root root 0  2월 24 18:31 file5
+
+//숨김파일 모두 보임(상위도)
+[root@localhost korea]# ls -al
+합계 0
+drwxr-xr-x. 8 root root 158  2월 24 18:33 .
+drwxr-xr-x. 4 root root  31  2월 24 14:52 ..
+drwxr-xr-x. 2 root root   6  2월 24 18:33 .dir6
+-rw-r--r--. 1 root root   0  2월 24 18:33 .file6
+drwxr-xr-x. 2 root root   6  2월 24 18:31 dir1
+drwxr-xr-x. 2 root root   6  2월 24 18:31 dir2
+drwxr-xr-x. 2 root root   6  2월 24 18:31 dir3
+drwxr-xr-x. 2 root root   6  2월 24 18:31 dir4
+drwxr-xr-x. 2 root root   6  2월 24 18:31 dir5
+-rw-r--r--. 1 root root   0  2월 24 18:31 file1
+-rw-r--r--. 1 root root   0  2월 24 18:31 file2
+-rw-r--r--. 1 root root   0  2월 24 18:31 file3
+-rw-r--r--. 1 root root   0  2월 24 18:31 file4
+-rw-r--r--. 1 root root   0  2월 24 18:31 file5
+
+//숨김파일은 rm -rf으로 못지움
+[root@localhost korea]# rm -rf *
+[root@localhost korea]# ls -l
+합계 0
+[root@localhost korea]# ls -la
+합계 0
+drwxr-xr-x. 3 root root 33  2월 24 18:37 .
+drwxr-xr-x. 4 root root 31  2월 24 14:52 ..
+drwxr-xr-x. 2 root root  6  2월 24 18:33 .dir6
+-rw-r--r--. 1 root root  0  2월 24 18:33 .file6
+
+//숨김 파일들은 모든걸 지우거나, 모든걸 복사하기 불가
+=> 보안의 문제때문에
+
+//h옵션 -사람이 보기 편하게
+[root@localhost home]# cp /boot/vmlinuz* .
+//사람이 보기 불편, 몇 메가인지 모름
+[root@localhost home]# ll
+합계 26108
+drwxr-xr-x.  3 root root       33  2월 24 18:42 korea
+drwx------. 14 test test     4096  2월 24 00:54 test
+-rwxr-xr-x.  1 root root 13364712  2월 24 18:48 vmlinuz-0-rescue-0469c1bcb569421d8e613e3cf1a7253b
+-rwxr-xr-x.  1 root root 13364712  2월 24 18:48 vmlinuz-5.14.0-362.8.1.el9_3.x86_64
+
+//h옵션 주기
+[root@localhost home]# ls -lh
+합계 26M
+
+//k, m,키로바이트, 메가바이트 등으로 보여줌
+drwxr-xr-x.  3 root root   33  2월 24 18:42 korea
+drwx------. 14 test test 4.0K  2월 24 00:54 test
+-rwxr-xr-x.  1 root root  13M  2월 24 18:48 vmlinuz-0-rescue-0469c1bcb569421d8e613e3cf1a7253b
+-rwxr-xr-x.  1 root root  13M  2월 24 18:48 vmlinuz-5.14.0-362.8.1.el9_3.x86_64
+[root@localhost home]# 
+
+
+//-F
+[root@localhost home]# ls -l
+합계 26108
+drwxr-xr-x.  3 root root       33  2월 24 18:42 korea
+drwx------. 14 test test     4096  2월 24 00:54 test
+-rwxr-xr-x.  1 root root 13364712  2월 24 18:48 vmlinuz-0-rescue-0469c1bcb569421d8e613e3cf1a7253b
+-rwxr-xr-x.  1 root root 13364712  2월 24 18:48 vmlinuz-5.14.0-362.8.1.el9_3.x86_64
+[root@localhost home]# ls -lF
+합계 26108
+drwxr-xr-x.  3 root root       33  2월 24 18:42 korea/
+drwx------. 14 test test     4096  2월 24 00:54 test/
+-rwxr-xr-x.  1 root root 13364712  2월 24 18:48 vmlinuz-0-rescue-0469c1bcb569421d8e613e3cf1a7253b*
+
+
+//S옵션
+[root@localhost korea]# ls -lS
+합계 26116
+-rwxr-xr-x. 1 root root 13364712  2월 24 19:08 vmlinuz-0-rescue-0469c1bcb569421d8e613e3cf1a7253b
+-rwxr-xr-x. 1 root root 13364712  2월 24 19:08 vmlinuz-5.14.0-362.8.1.el9_3.x86_64
+-rw-r--r--. 1 root root     2104  2월 24 19:08 passwd
+----------. 1 root root     1131  2월 24 19:08 shadow
+-rw-r--r--. 1 root root      811  2월 24 19:08 group
+//ls -lSr 역순으로
+[root@localhost korea]# ls -lSr
+합계 26116
+-rw-r--r--. 1 root root      811  2월 24 19:08 group
+----------. 1 root root     1131  2월 24 19:08 shadow
+-rw-r--r--. 1 root root     2104  2월 24 19:08 passwd
+-rwxr-xr-x. 1 root root 13364712  2월 24 19:08 vmlinuz-5.14.0-362.8.1.el9_3.x86_64
+-rwxr-xr-x. 1 root root 13364712  2월 24 19:08 vmlinuz-0-rescue-0469c1bcb569421d8e613e3cf1a7253b
+
+
+==================================================
+10. 정렬
+#sort [옵션][파일.....]
+
+<옵션>
+-r : 역순으로 내림차순
+-o : 파일로 저장
+-k : 필드 지정
+-f : 대소문자 구별 무시
+-t : 구분자 지정
+-n : 숫자로 인식
+
+
+
+
+
+
+//알파벳순
+[root@localhost korea]# sort passwd7
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+root:x:0:0:root:/root:/bin/bash
+
+//역순
+[root@localhost korea]# sort -r passwd7
+root:x:0:0:root:/root:/bin/bash
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+bin:x:1:1:bin:/bin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+
+//2 파일을 역순으로 같이 정렬
+[root@localhost korea]# sort -r passwd7 shadow7
+root:x:0:0:root:/root:/bin/bash
+root:$6$7ZfpXz3ZqexF6eS2$Yjht08Z1kD7OihBny1K4itdfhYUi7m9I99Fi1moCUmwbD1.2gecJY6R9NT6PLuK2pM0kv.yKRH0S1fZFcg5g31::0:99999:7:::
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+lp:*:19469:0:99999:7:::
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+daemon:*:19469:0:99999:7:::
+bin:x:1:1:bin:/bin:/sbin/nologin
+bin:*:19469:0:99999:7:::
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+adm:*:19469:0:99999:7:::
+
+
+//종합
+# sort -k 3 -n -r -t : passwd //3번째 필드의 숫자를 역순으로 정렬
+# sort -k 3 -n -t -r : passwd  <=요건 안됨
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<<<<<<<<<<<<참고>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+특정 파일 위치를 찾고 싶을 때 : #find / -name file100
+현재 시간 알고 싶을 때 : #date  //2024. 02. 24. (토) 15:49:14 KST
+파일의 맨 윗단 보고싶을 때 : # head passwd
+복습 : 
+	리다이렉션 
+		- 표준 출력/입력 (A>B)
+		#cat passwd7 > passwd ← 덮어쓰기 
+		#cat cal2.txt >> cal1.txt ← 기존 내용에 추가 
+	옵션 
+		- n : 행 번호 출력 
+		- b : 빈 행 제외하고 출력 
+
+
+*한글전환
+shift + 스페이스바
+
+
+[root@localhost korea]# alias
+alias cp='cp -i'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias l.='ls -d .* --color=auto'
+alias ll='ls -l --color=auto'
+alias ls='ls --color=auto'
+alias mv='mv -i'
+alias rm='rm -i'
+alias xzegrep='xzegrep --color=auto'
+alias xzfgrep='xzfgrep --color=auto'
+alias xzgrep='xzgrep --color=auto'
+alias zegrep='zegrep --color=auto'
+alias zfgrep='zfgrep --color=auto'
+alias zgrep='zgrep --color=auto'
+
+==================================================
+[vi 편집기]
+>모드형 편집기
+>모드 : 1.편집모드, 2.명령모드, 3.실행모드
+>vi 편집기 환경설정 파일: /etc/.exrc
+
+cd //tk
+vi .exrc  //vi 환경설정 파일로 들어감
+se nu //vi 열때마다 number 보이게
+colo evening  //evening컬러로 배경 보이게
+
+#vi  
+>명령모드  -> 편집모드(i,a,o)//끼워넣기 ->명령모드(ESC) 
+-> 실행모드(:) ->저장만(:w), 저장후 나가기(:wq), 파일명도(:w test.txt)
+
+[명령모드]
+x : 한문자 지우기
+dw : 한 단어 지우기
+r : 한 문자 치환
+ndd : n줄 지우기
+nyy : n줄 복사 (복사하길 원하는 곳에 커서를 둬야함)
+p : 붙여넣기(월하는 곳에 커서두기)
+u :  되돌리기
+3G : 3번째줄로 이동
+
+[실행모드]
+:w test.txt   : 파일명 지정해주기
+		(처음부터 vi text7.txt로 지정해주고 들어가도됨)
+:q :저장하지 않고  나가기
+:q! : 강제로 저장하지 않고 나가기 
+	(readonly파일-shadow파일같은 경우 관리자도 강제로 나가야함. )
+:wq : 저장하고 나가기
+:wq! : 강제로 저장하고 나가기 (readonly파일)
+:w : 중간저장(나가진x)
+
+:set number   : 행 번호 붙이기 (줄여서  :se nu)
+:set nonumber : 행 번호 제거 ( 줄여서 :se nonu)
+
+:%s/linux/linux7/g <-- 모든 linux라는 단어를 linux7으로 치환
+:2,10s/windows/windows7/g <--1행부터 10행까지 windows를 windows7으로 치환
+
+//문자열 치환할때
+:%s/linux/linux7/g  //linux라는 단어를 linux7으로  치환
+
+//몇줄만 치환 원할 때
+:1, 5s/linux/linux7/g //1줄부터 5줄까지 linux를 linux7으로 치환
+
+
+-rw-r--r--. 1 root root 6850560  3월  2 17:45 backup.tar
+-rwxrwxrwx. 1 root root     123  3월  2 17:42 cron.sh
+-rw-r--r--. 1 root root      29  3월  2 17:23 cron1.sh
+-rwxr-xr-x. 1 root root     131  3월  2 17:22 cron2.sh
+-rwxr-xr-x. 1 root root      19  3월  2 17:33 cron3.sh
+-rw-r--r--. 1 root root      24  3월  2 17:46 cronfinal.sh
+-rw-r--r--. 1 root root    2219  3월  2 16:50 passwd
+                                     

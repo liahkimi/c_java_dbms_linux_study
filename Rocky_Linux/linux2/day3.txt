@@ -1,0 +1,209 @@
+[고정ip 복습]
+ifconfig 확인
+EDIT > virtual Network editor에서 지정된 ip 사용 > VMNET18 (NAT) >Subnet IP 3번째 확인 > DHCP 3번째 확인 >NAT 3번째 확인
+
+안되면, 3개의 인터페이스 모두 삭제 후, 아래처럼 다시 만들기
+Vmnet0 - bridged
+vmnet1
+vmnet8 - NAT
+//방화벽 비활성화 설정
+systemctl stop firewalld
+grubby --update-kernel ALL --args --selinus=0
+systemctl restart NetworkManager
+ifconfig
+ping 8.8.8.8
+
+---------------------------------------------------------------------------------
+[2024.-03-23]
+[Samba Server 구축]
+
+01. 프로그램 설치
+#yum -y install samba*
+#yum -y install samba-common-libs.i686 (common하고 tab)
+#yum -y install samba-client.x86_64
+
+02. 환경 설정 파일
+> /etc/samba/smb.conf
+> vi smb.conf
+ 10 [global]
+ 11         workgroup = SAMBA <-window와 이론상 일치해야함
+ 12         security = user <-인증(user) - 사용자 인증
+ 41 print$ 밑에
+ 42 [public]
+ 43          comment = Home Directories
+ 44          path = /samba
+ 45          public = Yes
+ 46          browseable = Yes
+ 47          read only = No 
+
+03. Samba 사용자 계정 생성/추가
+===================================
+위의 내용이 안될때
+2. 환경설정 파일
+[global]
+        workgroup = WORKGROUP
+        map to guest = Bad User
+        security = user
+
+        passdb backend = tdbsam
+
+        printing = cups
+        printcap name = cups
+        load printers = yes
+        cups options = raw
+[korea]
+        comment = Home Directories
+        valid users = @korea
+        path = /samba
+        writable = Yes
+        guest ok = No
+        browseable = Yes
+        read only = No
+//samba 디렉터리 생성
+#mkdir samba
+#groupadd korea
+#chgrp korea samba
+#chmod 770 samba
+//사용자 계정 생성
+#useradd samba
+//사용자를 korea 그룹에 소속
+#usermod -G korea samba
+=============================================
+
+[FTP Server 구축]
+> 종류 : 
+1) FTP(20,210)[인증]
+2) Anonymous FTP(20,21)[인증같지 않은 인증 : ID : anonymous, password :이메일주소]
+3) TFTP(69)[인증x] -보안 가장 취약
+
+01. 프로그램 설치
+1) 서버 : vsftpd
+2) 클라이언트 : ftp
+#yum -y install vsftpd*
+#yum -y install ftp
+
+02. 환경 설정 파일
+> /etc/vsftpd/vsftpd.conf
+그냥 두고 저장
+
+//방화벽은 꼭 해제해주기
+# systemctl stop firewalld
+# grubby --update-kernel ALL --args --selinux=0
+# systemctl restart vsftpd
+
+03. 포트 변경
+> 21 -> 2121 (방화벽 가동 시 안된다고 함)
+listen_port=2121 ( 랜덤으로 포트가 열림)
+local_max_rate=300000
+-----------------------------------------------------
+> 제어 포트 변경 시 데이터 포트 랜덤 접속에 따른 포트 고정
+> Passive Mode 작동
+#pasv_min_port=2020
+#pasv_max_port=2020
+
+> 방화벽에 포트 추가 및 적용
+# firewall-cmd --permanent --add-port=2121/tcp => 2121포트 열어줌
+//데이터 포트가 열리면서 데이터 전송이 시작 됨
+# firewall-cmd --permanent --add-port=2020/tcp => 2020포트 열어줌
+# firewall-cmd --reload => 공통적으로 적용해줄 것
+
+
+-----------------------------------------------------
+
+#vi vsftpd.conf
+마지막 부분에 
+listen_ipv6=YES
+
+
+pam_service_name=vsftpd
+user_list = Yes
+
+listen_port=2121
+local_max_rate=30000
+
+----------------------------------------------------------
+04. 사용자 접근 제한
+> 파일명 : /etc/user_list <--등록된 사용자 제한
+>             /etc/ftpusers <--PAM로 사용자 제한
+접근 가능하게 하려면 사용자를 주석처리하거나 삭제하면 된다.
+
+//VSFTPD.CONF
+listen_ipv6=YES
+
+pam_service_name=vsftpd
+user_list = Yes
+
+listen_port=2121
+local_max_rate=30000
+--------------------------------------------------------------------
+[anonymous FTP]
+
+01. 환경설정
+> 12 anonymous_enable = NO
+
+> 아까 위에서 했던 부분(listen_port와 local_max_rate) 주석 처리 하기
+123 listen_ipv6=YES
+124 
+125 pam_service_name=vsftpd
+126 userlist_enable=YES
+127 
+128 #listen_port=2121
+129 #local_max_rate=30000
+
+># systemctl restart vsftpd
+> 윈도우 cmd창에서
+ftp 192.168.33.100 한뒤
+id  : anonymous
+pw : 이메일 없다면 아무거나 입력해도 로그인됨
+
+> 공개 폴더
+/var/ftp/pub
+
+02. 파일 업/다운로드
+>  28 anon_upload_enable=YES  (주석 해제)
+> /var/ftp/pub 디렉터리 허가권 변경
+> #chmod 777 pub
+> 업로드 가능
+=> 안되네..
+
+03. 파일 다운로드 설정 => 된다.
+> anon_world_readable_only=NO
+
+04. 전송 속도 제한
+> anon_max_rate=300000
+
+05. 파일 삭제 권한 (허용)
+>anon_other_write_enable=YES
+
+firewall-cmd --permanent --add-port=2121/tcp
+firewall-cmd --reload
+
+
+2121 포트로는 데이터포트가 랜덤으로 지정되기 때문에
+listen_ipv6=YES
+
+pam_service_name=vsftpd
+userlist_enable=YES
+
+listen_port=2121
+pasv_enable=YES
+pasv_min_port=2020
+pasv_max_port=2020 //포트 고정
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

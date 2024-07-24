@@ -1,0 +1,103 @@
+package day04;
+
+import java.util.Scanner;
+
+public class SwitchTest {
+
+	public static void main(String[] args) {
+
+//		int num = 1;
+//		switch(num) {
+////		num == 1
+////		num==1||num==3
+//		case 1: case 3:
+//			System.out.println("num이 1이라면 실행할 코드");
+//			break;
+////		num == 2
+//		case 2:
+//			System.out.println("num이 2이라면 실행할 코드");
+//			break;
+////		num == 4
+//		case 4:
+//			System.out.println("num이 4이라면 실행할 코드");
+//			break;
+////		if문의 else 키워드와 동일
+//		default:
+//			System.out.println("모두 일치하지 않습니다.");
+		}
+		
+//		실습1.
+//		사용자에게 월을 입력받고, 해당되는 계절을 출력하기.
+//		12,1,2월 = 겨울
+//		3,4,5월 = 봄
+//		6,7,8월 = 여름
+//		9,10,11월 = 가을
+		
+//		Scanner sc = new Scanner(System.in);
+////		사용자가 입력한 월을 저장할 변수
+//		int month = 0;
+////		계절을 저장할 변수
+//		String season = null;
+////		사용자에게 월을 입력받는다.
+//		System.out.println("월을 입력하세요 >>");
+//		month = sc.nextInt();
+//		switch(month) {
+//		case 12: case 1: case 2:
+//			season="겨울";
+//				break;
+//		case 3: case 4: case 5:
+//			season="봄";
+//			break;
+//		case 6: case 7: case 8:
+//			season="여름";
+//			break;
+//		case 9: case 10: case 11:
+//			season="가을";
+//			break;
+////			default는 잘못된값을 잡는 용도로 씀
+//		default:
+//			season = "잘못된 입력";
+//			break;
+//		}
+//		System.out.println(season+"입니다.");
+		
+//		boolean은 switch문을 사용할 수 없다.
+//		boolean isTrue = true;
+//		switch(isTrue) {
+//		
+//		}
+		
+//		(실수) double은 switch문을 사용할 수 없다.
+//		double doubleVar = 10.7;
+//		switch(doubleVar){
+//			
+//		}
+		
+		
+//	실습2.
+//	사용자에게 주민번호 뒷자리 7자리를 입력받고, 여성인지 남성인지 출력하기
+//	뒷자리의 첫글자 2, 4이면 여성
+//	뒷자리의 첫글자 1, 3이면 남성
+		
+		
+		Scanner sc = new Scanner(System.in);
+		int num = 0;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+
+}

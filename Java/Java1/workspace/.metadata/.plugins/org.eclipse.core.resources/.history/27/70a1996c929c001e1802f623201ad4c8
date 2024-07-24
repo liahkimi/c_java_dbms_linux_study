@@ -1,0 +1,82 @@
+package day04;
+
+import java.util.Scanner;
+
+public class ForTest2 {
+
+	public static void main(String[] args) {
+
+//		실습1. 1부터 50까지 출력
+		for(int i = 0; i<50; i++ ) {
+			System.out.println("i="+(i+1));
+		}
+//		실습2. 50부터 1까지 출력
+		for(int i =50; i>0; i-- ) {
+			System.out.println("i="+i);
+		}
+//		실습3. 주어진 for문을 가지고 5부터 1까지 출력
+		for(int i = 0; i <5; i++) {
+			System.out.println(5-i);
+		}
+//		실습4.
+//		1~10까지의 정수중에서 짝수만 출력하기
+		for(int i = 1; i<11; i++) {
+			if(i%2==0) {
+				System.out.println("짝수"+i);
+			}
+		}
+		
+//		if문을 사용하지 않고 짝수 출력하려면?
+		for(int i = 2; i<11; i+=2) {
+			System.out.println("i="+i);
+		}
+		
+//		사용자가 입력한 범위까지 정수를 출력하기
+//		Scanner sc = new Scanner(System.in);
+//		int num = 0;
+//		System.out.println("1부터 몇까지 출력할까요?");
+//		num = sc.nextInt();
+//		for(int i = 1; i <=num; i++) {
+//			System.out.println(i);
+//		}
+		
+//		실습4.
+//		1부터 사용자가 입력한 정수까지의 합계를 구하기
+		Scanner sc = new Scanner(System.in);
+//		입력한 정수를 저장할 변수
+		int num = 0;
+//		변화나는 정수를 누적해서 더할 변수
+		int sum = 0; 
+//		사용자에게 정수를 입력받는다.
+		System.out.println("1부터 몇까지 합계를 구할까요?");
+		num = sc.nextInt();	
+		
+		for(int i = 1; i <=num; i++) {	
+			sum += i;//누적
+		}
+		System.out.println(sum);
+		
+		
+			
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+
+}

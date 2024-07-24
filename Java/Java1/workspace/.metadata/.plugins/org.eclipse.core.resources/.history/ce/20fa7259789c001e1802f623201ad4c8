@@ -1,0 +1,23 @@
+package day04;
+
+public class IfTest {
+
+	public static void main(String[] args) {
+		
+//		if문
+		int num = 2;
+		if(num > 0) {
+			System.out.println("양수입니다.");
+		}
+		
+		boolean bool = false;
+		if(bool) {
+			System.out.println("bool 변수의 값이 true이면 실행할 코드");
+		}
+		if(!bool) {
+			System.out.println("bool 변수의 값이 false이면 실행할 코드");
+		}
+
+	}
+
+}

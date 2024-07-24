@@ -1,0 +1,12 @@
+package day04;
+
+public class Operator {
+
+	public static void main(String[] args) {
+		
+//		삼항 연산자
+		int num = 28;
+
+	}
+
+}

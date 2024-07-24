@@ -1,0 +1,226 @@
+클라이언트 프로그램 : 요청 / 명령어 부분 / chrome, edge 브라우저
+서버 프로그램 : 제공 / 관리 /apache
+
+
+네트워크 종류
+- TCP /IP : 차등 레벨 (클라이언트(자식:요청) ->서버(부모:제공))
+- P2P (Peer to Peer) : 동등 레벨 (서버와클라이언트 -> 서버와클라이언트) - 메신저
+
+
+데몬
+> 서비스를 제공해주는 프로세스(서버)
+> 데몬 (프로세스) : 프로그램 파일은 HDD(apache)에 있다가 메모리(http/데몬)에서 실행하는 과정
+> 운영체제에서 사용자가 직접 제어하지 않아도, 백그라운드에서 여러 작업을 하는 프로그램
+> 부모 프로세스를 갖지 않으며, 대부분 프로세스 트리에서 systemd 바로 아래에 위치.
+즉, 시스템의 첫 프로세스(대빵 프로세스)인[pid가 1인] systemd의 바로 하위
+
+데몬 : 백그라운드에서 여러 작업 수행
+- standalone 방식
+	- Rocky-linux의 방식 (4개가 실행됨)
+	- 주기억장치에 대기해서 바로 바로 실행됨
+	- 독립 방식
+	- 자주 사용하는 서비스
+	- 응답 속도 빠름
+	- /etc/init.d
+	- httpd, named, sendmail 를 자주 씀
+- Xinetd 방식
+	- 슈퍼 데몬 방식
+	- 가끔 사용하는 서비스
+	- 응답 속도 느림
+	- /etc/xinetd.d 
+	- telneted, sshd, ipop3d 를 자주 씀
+
+xineted(슈퍼데몬 방식)
+	client(telnet client)  -> server(xinetd -> telnet server)=>클라와서버소통가능
+	client(fitp clienet)  -> sever(xinetd -> FTP server)=> 클라와 서버 소통 가능
+	xinetd = 슈퍼데몬
+
+=====================================================
+
+[2024.03.16]
+
+[Linux Server]
+
+01. 고정 IP 주소 설정
+
+1> # cd /etc/NetworkManager/  (NetworkManager는 탭으로)
+2> # cd system-connections/  (system-connections는 탭으로)
+3> # pwd => /etc/NetworkManager/system-connections 
+4> # ll => -rw-------. 1 root root 229  3월 16 16:38 ens160.nmconnection
+5> # ifconfig 로 고정ip 확인하기
+6> # vi ens160.nmconnection  (ens160.nmconnection는 탭으로) 
+7> vi에디터 안에 9.[ethernet] 아래  밑의 내용 추가하기
+
+//3/23 새로한것
+inet 192.168.33.129  netmask 255.255.255.0  broadcast 192.168.33.255
+//50
+[ipv4]
+method=auto
+address1 = 192.168.33.50/24,192.168.33.2
+dns=8.8.8.8;
+
+//100
+inet 192.168.33.130  netmask 255.255.255.0  broadcast 192.168.33.255
+[ipv4]
+method=auto
+address1 = 192.168.33.100/24,192.168.33.2
+dns=8.8.8.8;
+
+9> # systemctl restart NetworkManager 네트워크 서비스 재시작
+10> # ifconfig   고정ip 바뀌었는지 확인하기
+11> # ping8.8.8.8로 네트워크 테스트
+
+//내 네트워크 확인하는 법 **
+Edit > Virtual Network Editor > NAT > Subnet IP : 192.168.213.0 (세번째를 확인 )
+>DHCP Settings에도 세번째 확인 > NAT Settings에도  세번째 확인
+>ok ->  # systemctl restart NetworkManager 네트워크 서비스 재시작
+
+
+02. 네트워크 서비스 재시작
+#systemctl restart NetworkManager
+
+03. server50과 server100 연결되는지 ping 확인하기
+서로 교차로 테스트하기
+server-50에는  # ping 192.168.33.100
+server-100에는  # ping 192.168.33.50
+여기까지 다 됐으면 스냅샷 찍어 두기!!
+
+방화벽 설정
+systemctl stop firewalld
+grubby --update-kernel ALL --args --selinus=0
+systemctl restart NetworkManager
+
+//여기까지는 기본으로 다 해두기!
+
+===========================================================
+04. 서버 접속
+> 원격 접속
+ //디폴트로 활성화 되어있음
+
+1) telnet
+2) ssh
+
+# ssh -l root localhost //로컬 시스템에 root 사용자로 SSH 연결을 시도함
+//ssh : ssh(secure shell)프로토콜을 사용하여 원격시스템에 접속하는 명령어
+//-l  root : SSH 접속 시에 사용할 사용자 이름을 지정합니다. 여기서는 root 사용자로 접속하겠다는 것을 의미합니다.
+//localhost: 접속할 원격 시스템의 호스트 이름이나 IP 주소입니다. 여기서는 로컬 시스템을 가리킵니다.
+===========================================================
+[서버 구축]
+
+<Telnet 서버 구축>
+> 원격 접속 프로그램
+> telnet 포트 번호 : 23번 (ssh는 22번)
+telnet 서버의 환경 설정파일 : /usr/lib/systemd/system/telnet.socket
+
+01. 클라/서버 프로그램 설치
+> 서버 프로그램 : telnet-server
+> 클라이언트 프로그램 : telnet 
+> 데몬명 :  telnet.socket
+
+#yum -y install telnet-sever.x86_64 <--서버 설치
+#yum -y install telnet <-- 클라이언트 설치
+
+02. 서버 시작 / 재시작 / 중지 / 상태
+#systemctl start/restart/stop/status [서비스명/데몬명]
+#systemctl restart telnet.socket
+
+
+// + 방화벽 중단
+#systemctl start/restart/stop/status [서비스명]
+#systemctl stop firewalld  (50에서 연결 안될떄 100에서 할것
+
+//+ 서비스 자동 실행 활성화, 비활성화
+#systemctl enable telnet.socket //활성화  
+#systemctl enable telnet.socket //활성화  
+#systemctl status telnet.socket //
+
+//+ 방화벽 자동 실행 활성화, 비활성화
+#systemctl enable firewalld //활성화 
+#systemctl disable firewalld //비활성화  
+#systemctl status firewalld //방화벽 현재 상태 확인
+
+--------------------------------
+[서버 구축 순서]
+
+1. 서버 (server_100)
+1> yum -y install telnet-serverx86_64 <-telnet-server 프로그램 설치
+2> systemctl restart telnet.socket <- 재시작해보기
+3> systemctl status  telnet.socket   <-성공인지 확인
+4> 클라이언트(server_50)에서 telnet 192.168.213.100이 안될때
+5> systemctl stop firewalld <- 방화벽 해제 명령어
+
+2. 클라이언트 (server_50)
+1> telnet  <-설치 안되어있으면 y로 설치하면 됨
+2> 서버(server_100)에 방화벽 해제 시킨 후에
+3> telnet 192.168.213.100  <- 서버(server_100)와 연결되는지 확인칟
+-----------------------------------------
+
+03. 클라이언트에서 서버 접속
+#telnet [서버 IP 주소]
+#telnet 192.168.213.100
+
+--------------------------
+//ssh연결 시도
+# ssh -l root 192.168.213.100 
+//192.168.213.100 주소의 시스템에 root 사용자로 SSH 연결을 시도
+yes
+내 패스워드 입력
+---------------------------------
+04. telnet 서버 포트 변경
+> 포트 : 23 --> 213
+> telnet 서버의 환경 설정파일 : /usr/lib/systemd/system/telnet.socket
+
+//서버쪽에서 포트변경 시작하기 
+1> # find / -name telnet.socket
+-> /sys/fs/cgroup/system.slice/telnet.socket
+/etc/systemd/system/sockets.target.wants/telnet.socket
+/usr/lib/systemd/system/telnet.socket
+
+2> # vi  /usr/lib/systemd/system/telnet.socket
+
+3> 에디터에서 포트번호 편집 (23 -> 2323)
+
+[Unit]
+Description=Telnet Server Activation Socket
+Documentation=man:telnetd(8)
+
+[Socket]
+ListenStream=2323  <- 요기 편집
+Accept=true
+
+[Install]
+WantedBy=sockets.target
+~                          
+
+4> # systemctl restart telnet.socket  //텔넷 소켓 재시작
+
+5> # systemctl daemon-reload
+
+6>  # systemctl restart telnet.socket
+
+7> 서버 리부팅
+
+8> 클라이언트에서  # telnet 192.168.213.100 213  (바꾼 포트번호 213으로)
+
+
+[root@localhost ~]# telnet 192.168.213.100 213
+Trying 192.168.213.100...
+Connected to 192.168.213.100.
+Escape character is '^]'.
+
+Kernel 5.14.0-362.8.1.el9_3.x86_64 on an x86_64
+localhost login: test
+Password: 
+[test@localhost ~]$ 
+
+
+--------------------------------
+방화벽 설정
+systemctl stop firewalld
+grubby --update-kernel ALL --args --selinus=0
+systemctl restart NetworkManager
+
+
+
+
+

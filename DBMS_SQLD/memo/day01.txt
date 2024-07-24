@@ -1,0 +1,178 @@
+day01. DBMS, 오라클, 디비버, 주석
+
+OT
+	1. 강사 : 서민성 강사
+	2. 수업시수 : 3시간 * 10일 = 30시간
+	02-07	02-14	02-19	02-21	02-23	02-26	02-28	03-04	03-06   03-08
+
+	3. 수업자료 : 오픈 카카오 채팅방(자료 및 줌링크)
+	4. 수업방식 : 50분 수업, 10분 휴식
+	(이론 설명 및 메모장 작성 -> 예제 -> 실습)
+	5. 이메일 : yup1yup1201@gmail.com
+	6. 제목 : 1900 DBMS 홍길동(본인이름)
+	8. 내용 : 쿼리문(본인이 작성한 코드 복사), 에러메세지
+	(에러 발생시 에러메세지 복사), 질문 내용
+	9. 자리 : 대면 자리는 고정!
+	10. 조교시스템 : 담당 멘토 선생님께 보충 강의 신청가능
+
+데이터베이스(Database)
+	데이터들의 모음이 저장된 공간
+	
+DBMS(Database Management System)
+	데이터베이스 관리 시스템(소프트웨어)
+	데이터베이스와 사용자를 연결해주는 시스템
+
+	사용자 -> DBMS -> DB
+
+데이터베이스의 종류
+	
+	1. 관계형 데이터베이스(RDB)
+	2. 객체 지향 데이터베이스
+	3. NoSQL 데이터베이스
+	4. 분산 데이터베이스
+	....
+
+RDB(Relational Database)
+	관계형 데이터베이스
+	데이터를 2차원(테이블)형태로 표현한다
+	테이블(table)
+		- 행(row)과 열(column)로 이루어진 2차원 표
+		- 행(row) : 가로줄, 튜플(tuple), 레코드(record),
+		인스턴스(instance)
+		- 열(column) : 세로줄, 필드(field), 속성(attribute)
+
+		철수 19세 170cm	철수	영희
+		영희 20세 159cm	19세	20세
+				170cm	159cm
+
+		* 행 : 개별 관측대상에 대한 다양한 속성 데이터
+		* 열 : 공통의 속성이나 범주
+
+RDBMS(Relational Database Management System)
+	관계형 데이터베이스 관리 시스템
+
+	* MySQL, MsSQL, MariaSQL, Oracle Database....
+
+오라클 다운로드
+	
+	11g 버전을 운영체제 맞추어 다운로드
+	https://www.oracle.com/database/technologies/xe-prior-release-downloads.html	
+
+
+오라클 계정
+	
+	1. sys : oracle dbms 관리자 계정(총괄 관리자)
+	2. system : dbms 운영을 위한 관리자 계정(운영자)
+	3. hr : 오라클이 기본적으로 제공하는 학습을 위한 계정
+
+권한
+	sysdba : 데이터베이스 생성 및 삭제 등 모든 권한을 가진다(sys)
+	sysoper : 데이터베이스 운영을 위한 권한(system)
+
+디비버(DBeaver)
+	범용 데이터베이스 도구. GUI 환경을 통해 편리하게 DBMS를
+	사용할수 있게 도와주는 도구
+
+	https://dbeaver.io/download/
+
+DBeaver 설치
+	구글 검색창에 DBeaver 검색
+	> 최상단 링크 접속 및 운영체제 맞추어 다운로드 진행
+	Windows installer (프로그램 자체를 설치)
+	Windows zip(압축을 풀어서 프로그램을 사용)
+
+DBeaver 데이터베이스 연결
+	프로젝트 
+	> Connections 
+	> 우클릭 
+	> create 
+	> connection 
+	> oracle 
+	> Database : XE, 로그인하려는 계정, 비밀번호 입력 
+	> Test Connection 확인 후 연결 완료
+
+*연결 안될 때 : 
+1. 시작 메뉴 > cmd > 명령 프롬프트 실행
+2. sqlplus 실행 
+3. username : sys as sysdba
+4. password : (입력하지 않고 엔터)
+
+접속이 성공한다면 connected 오라클.. 이런 메세지가 나올겁니다
+그다음부터는 아래의 쿼리를 작성해주세요
+
+5. alter user sys identified by 1234;  -> User altered가 나오면 성공입니다
+6. alter user hr account unlock identified by 1234; -> User altered가 나오면 성공입니다
+7. conn hr/1234; -> connected가 나오면 성공입니다
+
+이렇게 한 후에 다시 디비버를 연결해서 사용해보세요^^ 
+database : xe
+username : hr
+password : 1234
+
+로 하신다음에 시도해보시면 됩니다
+
+
+
+* 최초 1회만 해야하는 것(드라이버 설정)
+	Driver settings > Libraries > 있는거 모두 삭제 후 > Add File > ojdbc6 추가 > 확인
+	ojdbc 경로 : C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib (항상이위치자동저장됨)
+	
+SQL(Sturctured Query Language)
+	관계형 데이터베이스에서 데이터를 관리하기 위해 사용하는 언어
+	SQL문을 통해 데이터베이스에서 데이터를 추가, 수정, 삭제, 조회한다
+	명령어를 SQL문, 쿼리문, 질의문이라고 한다
+	
+스크립트 파일(script)
+	명령어(쿼리문)를 작성할수 있는 파일
+	데이터베이스와 스크립트 파일을 연결해야 작성한 쿼리문이 실행된다
+
+새로운 프로젝트와 스크립트 파일 만들기
+	1. 프로젝트 클릭 > 프로젝트 생성 > 생성된 프로젝트 마우스 오른쪽
+	클릭 > set active....
+	2. 새로운 스크립트 파일 만들기 > scripts 폴더 마우스 오른쪽 클릭
+	> create > create new File 클릭
+
+쿼리문 작성 방법
+	여러줄에 걸쳐서 작성이 가능하다
+	실행에 영향을 주지 않지만, 가독성을 위해 줄바꿈, 들여쓰기를 사용한다
+	하나의 쿼리문의 마침표는 ;(세미콜론)으로 작성한다
+	대문자와 소문자를 구분하지 않는다
+	
+세미콜론(;)
+	쿼리문에서 사용하는 마침표.
+	쿼리문 끝에서 작성한다
+	여러개의 쿼리문이 있을때, 세미콜론을 통해서 하나의 쿼리문으로 판단한다
+	줄바꿈, 들여쓰기를 사용해도 세미콜론을 통해서 하나의 쿼리문으로 판단한다
+	
+
+디비버 단축키
+	1. 새로운 프로젝트 생성 : ctrl + n
+	2. 새로운 스크립트 파일 생성 : ctrl + ]
+	3. 한줄 쿼리문 실행 : ctrl + enter
+	4. 주석 : ctrl + / (설정 및 해제)
+	
+주석(comment)
+	주석 처리된 쿼리문은 실행(해석)되지 않는다
+	
+	1. 한줄 주석(--) : 해당 라인(줄)을 주석처리 한다
+		- 단축키 : ctrl + /
+	2. 범위 주석(/* */) : 범위 안에 있는 쿼리문을 주석처리 한다
+		- 단축키 : ctrl + shift + /
+		- 범위 주석 시작(/*), 범위 주석 끝(*/)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

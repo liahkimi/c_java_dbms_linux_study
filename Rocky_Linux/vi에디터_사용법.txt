@@ -1,0 +1,54 @@
+[vi 편집기]
+>모드형 편집기
+>모드 : 1.편집모드, 2.명령모드, 3.실행모드
+>vi 편집기 환경설정 파일: /etc/.exrc
+
+cd //tk
+vi .exrc  //vi 환경설정 파일로 들어감
+se nu //vi 열때마다 number 보이게
+colo evening  //evening컬러로 배경 보이게
+
+#vi  
+>명령모드  -> 편집모드(i,a,o)//끼워넣기 ->명령모드(ESC) 
+-> 실행모드(:) ->저장만(:w), 저장후 나가기(:wq), 파일명도(:w test.txt)
+
+[명령모드]
+x : 한문자 지우기
+dw : 한 단어 지우기
+r : 한 문자 치환
+ndd : n줄 지우기
+nyy : n줄 복사 (복사하길 원하는 곳에 커서를 둬야함)
+p : 붙여넣기(월하는 곳에 커서두기)
+u :  되돌리기
+3G : 3번째줄로 이동
+
+[실행모드]
+:w test.txt   : 파일명 지정해주기
+		(처음부터 vi text7.txt로 지정해주고 들어가도됨)
+:q :저장하지 않고  나가기
+:q! : 강제로 저장하지 않고 나가기 
+	(readonly파일-shadow파일같은 경우 관리자도 강제로 나가야함. )
+:wq : 저장하고 나가기
+:wq! : 강제로 저장하고 나가기 (readonly파일)
+:w : 중간저장(나가진x)
+
+:set number   : 행 번호 붙이기 (줄여서  :se nu)
+:set nonumber : 행 번호 제거 ( 줄여서 :se nonu)
+
+:%s/linux/linux7/g <-- 모든 linux라는 단어를 linux7으로 치환
+:2,10s/windows/windows7/g <--1행부터 10행까지 windows를 windows7으로 치환
+
+//문자열 치환할때
+:%s/linux/linux7/g  //linux라는 단어를 linux7으로  치환
+
+//몇줄만 치환 원할 때
+:1, 5s/linux/linux7/g //1줄부터 5줄까지 linux를 linux7으로 치환
+
+
+-rw-r--r--. 1 root root 6850560  3월  2 17:45 backup.tar
+-rwxrwxrwx. 1 root root     123  3월  2 17:42 cron.sh
+-rw-r--r--. 1 root root      29  3월  2 17:23 cron1.sh
+-rwxr-xr-x. 1 root root     131  3월  2 17:22 cron2.sh
+-rwxr-xr-x. 1 root root      19  3월  2 17:33 cron3.sh
+-rw-r--r--. 1 root root      24  3월  2 17:46 cronfinal.sh
+-rw-r--r--. 1 root root    2219  3월  2 16:50 passwd

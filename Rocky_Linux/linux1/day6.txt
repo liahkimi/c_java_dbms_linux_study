@@ -1,0 +1,236 @@
+[2024.03.03]
+
+[ HDD(하드 디스크) 추가]
+
+01. HDD 장착
+ADD하고
+#fdisk -l 로 확인하기 -> Disk /dev/nvme0n2  : 40GiB
+
+02. 파티션 나누기
+#fdisk /dev/nvme0n2
+#fdisk /dev/nvme0n3
+m(menu) > n(생성) > p > 1 > 2048=disk 하나를 다쓰겠단 말 >> w
+==> syncing disk 뜨면 됨
+
+03. 파일 시스템 생성
+#fdisk -l (나눠줬는지 확인)
+#mkfs.xfs /dev/nvme0n2p1
+#df -Th 로 확인 (type별로 확인 가능)
+
+04. 마운트
+#mount /dev/nvme0n2p1 /mnt
+#mount /dev/nvme0n2p1 /mnt2
+
+04-1. 자동 마운트
+#cd /etc
+#vi fstab
+	장치명 		마운트포인트   파일시스템유형  옵션	  덤프여부/검사여부
+	/dev/mapper/rl-swap     none               swap    defaults        0  0
+	/dev/nvme0n2p1          /home/mnt        xfs      defaults        0  0
+	/dev/nvme0n3p1          /home/mnt2       xfs     defaults        0  0
+	=> 첫번째줄을 복사해서 두번째줄처럼 수정해주고 저장
+
+	*장치명 : 마운트할 장치
+	*마운트 포인트 : 장치를 마운트할 지점
+	*파일 시스템 유형 : 해당 파일 시스템(ext, ext2, ext3, ext4, xfs)..iso9660(CD-ROM)
+	*덤프여부 : 오류가 났을 때, 덤프(백업) 여부 설정( 0 : 백업x , 1 : 백업설정)
+	*검사여부 : 부팅시 파일시스템 검사 여부 설정 
+		( 0 : 검사x, 1 : root 파일시스템 검사, 2 :root파일시스템을 제외한 모든 파일 시스템 검사)
+	*옵션 : 
+	defaults : rw, suid, dev, exec, auto, nouser, async(비동기화)
+	auto : 부팅 시, 자동마운트 허용
+	exec : 실행 파일 실행 허용
+	suid : SetUID, SetGID 사용 허용
+	ro : 읽기 전용
+	rw : 읽기, 쓰기 허용
+	user : 일반 사용자도 마운트 할 수 있게 허용
+	nouser : 일반 사용자는 마운트 제한
+	noauto : 자동 마운트 제한
+	noexec : 실행 파일 실행 제한
+	nouid : SetUID, SetGID 사용 제한
+	usrquota : 일반 사용자 쿼터 설정
+	grpquota : 그룹 사용자 쿼터 설정
+
+다른 창에서 
+#cd /home
+#mkdir mnt
+#init 0로 리부팅해서
+#df 로 마운트됐는지 확인하기
+
+------------------------------------------------------------------------------
+[기존 마운트 해제하고 파티션 2개로  나누기]
+
+// 1.기존 마운트 해제하기
+vi fstab에서 #로 기존에 마운팅했던거 주석처리하고
+수동으로 umount로 해제해도 된다.
+mount해제 후, fdisk -l로 해제되었고 아직 해제하지 않은 파티션 확인하기
+df -Th는 마운트 해제된것은 보이지 않는다.
+
+// 2.파티션 해제하기
+#fdisk /dev/nvme0n2
+
+// 3.fdisk들어가서 
+d > d > 파티션이 완전히2개 다 삭제>
+
+// 4.파티션 다시 나누기 각각 20G
+n > p > 1 > 2048 > +20G > Y > 
+n > enter > enter > enter > w 
+
+*여기서 만약, 파티션 3개로 나눈다면
+마지막 파티션은 직접 몇G를 넣을지 지정하지말고 엔터로 처리해야함.
+정확한 G를 지정하면, 에러 남.(잔여 용량이 딱 떨어지지 않아서.)
+
+// 5.파티션 나눠졌는지 확인
+#fdisk -l  
+	/dev/nvme0n2p1
+	/dev/nvme0n2p1로 나눠졌는지 확인
+
+// 6.파일시스템 생성하기(콩심을지, 팥심을지 경작할 방식 정한느거라 생각혀)
+mkfs.xfs /dev/nvme0n2p1
+mkfs.xfs  /dev/nvme0n2p2 
+
+//6-1. 파일시스템 생성됐는지 확인
+#df -Th 로 확인 (type별로 확인 가능)
+
+// 7.마운트해주기
+mount /dev/ nvme0n2p1 /home/mnt
+mount /dev/ nvme0n2p2 /home/mnt2
+
+// 8.마운트 완료됐는지 확인
+#df -Th
+
+// 9.자동 마운트 해주기
+cd /etc
+vi fstab
+아까 주석 처리했던거 해제하고 새로운 디렉터리와 장치명으로 내용 수정해주고 
+
+cd /etc/fstab
+mkdir 원하는 디렉터리
+#reboot
+재부팅후 #df -Th로 잘 됐는지 확인하기
+
+// 10. 확인법
+[root@localhost ~]# fdisk -l /dev/nvme0n2
+Disk /dev/nvme0n2: 40 GiB, 42949672960 bytes, 83886080 sectors
+Disk model: VMware Virtual NVMe Disk
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x73689bf9
+
+Device         Boot    Start      End  Sectors Size Id Type
+/dev/nvme0n2p1          2048 41945087 41943040  20G 83 Linux
+/dev/nvme0n2p2      41945088 83886079 41940992  20G 83 Linux
+
+
+=================================================
+[파티션 3개 나누기]
+<마운트 포인트>
+/home/red
+/home/blue
+/home/pink
+
+==================================================
+[LVM (Logical Volume Manager)]
+파티션 통합하기
+
+n2p1 : 40G
+n3p1 : 40G
+=> 80G 통합시키기
+
+1.  PV(Physical Volume) /개별적 물리적 볼륨 생성 
+    (40G + 40G) - 40G 각각 PV로 만들기
+
+2. VG(Volume Group) /볼륨으로 묶기/피지컬 볼륨
+    (40G + 40G ) = 80G
+
+3. LV(Logical Volume)/논리적 볼륨 생성
+	(80G) 완성 (논리적이여야 사용 가능)
+
+4. #mkfs.xfs /파일 시스템 생성
+
+5. #mount /dev/.... /mnt
+
+<LVM 구성>
+01. 새 HDD 장착
+dev/nvme0n4  - 40
+dev/nvme0n5  - 40
+
+02. 파티션 나누기
+>유형 변경 : linux(83) --> LVM(8e)
+파티션 만들고> t > 8e
+
+03. PV(Physical Volume) 생성
+# pvcreate /dev/nvme0n2p1 
+  Physical volume "/dev/nvme0n2p1" successfully created.
+# pvcreate /dev/nvme0n3p1
+  Physical volume "/dev/nvme0n3p1" successfully created.
+
+04. VG(Volume Group) 생성
+>그룹명 지정해주기(중복불가)
+# vgcreate [VG명] /dev/nvme0n2p1 /dev/nvme0n3p1
+
+# vgcreate myvg /dev/nvme0n2p1 /dev/nvme0n3p1
+  Volume group "myvg" successfully created
+= 60g 완성
+
+05. LV(Logical Volume)생성
+# lvcreate -n [LV명] -l 100%FREE [VG명]
+# lvcreate -n mylv -l 100%FREE myvg
+  Logical volume "mylv" created.
+
+# lvcreate -n mylv -l 30G //이렇게 파티션 나누기도 가능
+
+06. 파일 시스템 생성
+# mkfs.xfs /dev/myvg/mylv
+
+07. 마운트
+# mount /dev/myvg/mylv /mnt
+/dev/mapper/myvg-mylv xfs        60G  461M   60G   1% /mnt
+
+08.자동 마운트
+#cd etc/fstab
+
+----------------------------------------------------------------------------------------
+[미션]
+> HDD 40G 2개 장착
+> VG명 : myvg2, LV명 : mylv2  
+> 마운트 포인트 : /home/lvm
+> 자동 마운트
+---------------------------------------------------------------------------------------
+[디스크 용량 확장]
+00.파티션 나누기  -> #fdisk /dev/nvme0n6p1 -> t>8e설정해주기
+01. pv 생성  -> #pvcreate /dev/nvme0n6p1
+02. vgextend -> # vgextend myvg2 /dev/nvme0n6p1
+03. lvextend -> lvextend -l +100%FREE  /dev/myvg2/mylv2  
+                    //extend 명령어에서  여기서 자동으로 파일시스템
+[root@localhost ~]# lvextend -l +100%FREE /dev/myvg2/mylv2
+  Size of logical volume myvg2/mylv2 changed from 79.99 GiB (20478 extents) to <99.99 GiB (25597 extents).
+
+04. mount /dev/myvg2/mylv2 /mnt
+-> 합쳐진거 (논리적으로는 100기가 하나, 실제론 3개)
+
+<사이즈 갱신>
+#xfs_growfs /dev/myvg/mylv <--xfs 파일 시스템
+#resize2fs /dev/myvg/mylv <-- ext,ext2,ext3,ext4 파일 시스템
+--------------------------------------------------------------------------------------
+*DISK TYPE
+-DISK : IDE, SCSI ,SATA
+-MEMORY : NVME (비휘발성)
+
+*DISK를 이루고 있는 구성
+1.트랙
+2.섹터 - 섹터의 크기에 따라 용량 결정
+3.실린더
+
+*서버
+LVM(logical volume manager) - 리눅스에서만 
+RAID - 윈도우, 리눅스 둘다 쓰며 (현재 가장 많이 쓰는 서버) -싸구려 하드디스크 여러개를 1개로 모아
+
+*마운트란? 
+(https://www.linux.co.kr/bbs/board.php?bo_table=lecture&wr_id=3865 참고)
+특정 장치(device)를 하나의 디렉토리처럼 사용하기 위해 수행하는 작업
+
+
+

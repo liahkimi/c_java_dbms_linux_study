@@ -1,0 +1,57 @@
+package day04;
+
+public class ForTest {
+
+	public static void main(String[] args) {
+		
+//		for문
+//		i변수의 값을 0으로 초기화하고, i가 10보다 작은동안
+//		i의 값을 1씩 증가하면서 코드를 반복실행하겠다.
+//		제어변수를 가지고 증감을 하면서 조건식이 참인동안 코드를 반복실행
+//		조
+		for(int i = 0; i<10; i++) {
+			System.out.println("홍길동");
+		}
+//		제어변수 i는 for문 영역 안에서만 사용가능함
+//		System.out.println(i);
+
+//		i값을 감소시키면서 코드를 반복
+		for(int i = 3; i > 0; i--) {
+			System.out.println(i);
+		}
+//		i값을 2씩 증가시키면서 코드를 반복
+		for(int i = 0; i <10; i+=2) {
+			System.out.println(i);
+		}
+//		i변수는 for문이 종료되면 메모리에서 사라지므로, 
+//		반복해서 같은 i라는 변수명을 재사용해도 문제가 없다.
+		
+//		main메소드 영역에서 선언된 변수를
+//		for문 영역에서 사용할 수 있다.
+//		대신에 증감식을 통해 값이 변화된다.
+		int num = 0;//메인메소드영역의 변수 num
+		for(;num <5; num++) {
+			System.out.println("num은 "+num);
+		}
+		System.out.println(num);//밖에서도 num사용 가능
+		
+		
+		String name ="홍길동";
+		for(int i = 0; i <3; i++) {
+			System.out.println(name);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+
+}

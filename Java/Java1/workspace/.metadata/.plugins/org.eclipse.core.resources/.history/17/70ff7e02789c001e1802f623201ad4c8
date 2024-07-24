@@ -1,0 +1,15 @@
+package day04;
+
+public class IfTest {
+
+	public static void main(String[] args) {
+		
+//		if문
+		int num = -10;
+		if(num > 0) {
+			System.out.println("양수입니다.");
+		}
+
+	}
+
+}

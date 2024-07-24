@@ -1,0 +1,449 @@
+[2024. 03.02]
+
+[프로세스]
+> 주 프로세스 : systemd (CentOS7 미만에서는 init이 주 프로세스)
+> NI (nice값) : NI 는 사용자가 조작이 가능한 우선순위.
+		Linux 상에서 process 가 실행될 때, nice 라는 값을 갖고 실행됨.
+		nice 값은 process 간 실행 우선순위를 의미함.
+		무거운 process 에게 낮은 우선순위를 줘서 다른 process 보다
+		덜 실행되게 만들어 효율적인 멀티태스킹 환경을 구성할 수 있음.
+		nice 값은 -20부터 19까지 줄 수 있다.
+		nice 값이 낮을수록(-20에 가까울수록) 우선순위가 높아진다.
+		일반 유저는 process 의 nice 값을 높여서 우선순위를 낮추는 방향으로만 조절이 가능하다.
+		우선순위가 높은 특수한 process 들을 지키기 위해.
+		일반 유저가 아닌 root 관리자는 nice 값을 높이고 낮출 수 있다.
+>PRI (priority값) : PRI는 운영체제에서 참고하는 우선순위.
+			시스템 상황에 따라 알아서 부여되기 때문에, 사용자 입장에서 조작이 불가능
+======================================================
+01. pstree
+>프로세스 구조를 트리 형태로 출력
+
+#pstree [옵션]
+
+<옵션>
+-p : 프로세스 ID 출력 (pstree구조에 식별자(id)를 달아서 보여줌)
+
+======================================================
+02. ps
+> 프로세스 현재 상태 출력
+[root@localhost ~]# ps
+    PID TTY          TIME CMD
+   2625 pts/0    00:00:00 bash
+   2916 pts/0    00:00:00 ps
+------------------------------------------------------------------------------------------------
+프로세스의 운영 방식
+1)Foreground - 보여지게 운영되는 방식
+2)background - 보이지 않게 운영되는 방식 (#ps aux)
+------------------------------------------------------------------------------------------------
+USER : 프로세스를 실행한 계정명    
+PID : 프로세스 식별자
+PPID : 부모 프로세스 식별자
+STIME : 짧은 시간동안의
+%CPU : 해당 프로세스의 CPU 점유율
+%MEM : 해당 프로세스의 메모리 점유율
+VSZ : 가상 메모리 사용량
+RSS : 실제 메모리 사용량
+TTY : 접속 경로, 터미널
+STAT : 프로세스 상태(S(sleeping),R(running), T/D(stop),Z(zombie))
+START : 프로세스 실행 시작 시간
+TIME : 실행된 후 누적 시간 
+COMMAND : 명령어/ 프로세스명/프로그램명
+------------------------------------------------------------------------------------------------
+#ps [옵션]
+-a : all
+-u : user 사용자 정보 출력
+-x : 터미널과 관련 없는 프로세스 정보 출력 (다 출력됨)
+-e : 커널 프로세스를 제외하고 출력
+-f : full 포맷(길게 보여주는 것)
+#pstree
+#pstree -p
+#ps
+#ps -a
+#ps -au : 터미널
+#ps -aux
+#ps -ef
+#ps -ef|more
+
+//대부분은 -옵션이나 옵션이 같지만, f는 다름
+//ps -f 는 기존 full포맷으로 보여줌
+[root@localhost ~]# ps -f
+UID          PID    PPID  C STIME TTY          TIME CMD
+root        2625    2580  0 14:11 pts/0    00:00:00 bash
+root        3522    2625  0 15:10 pts/0    00:00:00 ps -f
+
+//ps f 는 계층화 구조로 보여줌
+[root@localhost ~]# ps f
+    PID TTY      STAT   TIME COMMAND
+   2683 pts/1    Ss+    0:00 bash
+   2625 pts/0    Ss     0:00 bash
+   3527 pts/0    R+     0:00  \_ ps f
+   1981 tty2     Ssl+   0:00 /usr/libexec/gdm-wayland-session --register-session
+   1987 tty2     Sl+    0:00  \_ /usr/libexec/gnome-session-binary
+
+======================================================
+03. top [옵션] : 실시간으로 3초마다 프로그램의 프로세스를 모니터링 해줌(디스플레이 해줌)
+
+>SUMMARY
+
+top - 15:12:16(현재시간) up  1:01(얼마동안 실행),  2 users(2명의 사용자),load average(부하 평균 시간): 0.87, 0.38, 0.18
+Tasks(작업수): 238 total(몇명이 일하는지),   1 running(실행중), 237 sleeping(대기중-일어날 수 있음), 0 stopped, 0 zombie(좀비프로세스-시스템에서 최악(멍때림))
+%Cpu(s):  7.7 us(사용자가 사용하는 점유율),  5.2 sy(시스템이 사용하는 점유율),  0.0 ni(나이스값 처리하느라 쓰는 점유율), 83.5 id(놀고있는것들의 점유율),  
+             0.0 wa(웨이팅,처리하려고 대기중인것들의 점유율),3.4 hi(하드웨어),  0.4 si,  0.0 st(정체상태)
+MiB Mem(주 기억 메모리) :   1732.2 total(전체 메모리 용량), 93.9 free,1209.2 used(사용된 용량),597.4 buff/cache
+MiB Swap(임시 메모리):   2056.0 total,   1779.2 free,    276.8 used.    523.0 avail Mem 
+
+*부모프로세스가 죽으면 자식프로세스도 따라 죽음
+	=>남아 있다면 좀비 프로세스(킬해야함)
+자식프로세스가 죽어도 부모프로세스는 그대로 존재
+
+
+>FORMAT
+PID USER  PR  NI(나이스값)   VIRT(가상메모리량)  RES(실제메모리량)  SHR(공동공유) S  %CPU(하나의 프로세스가 사용하는 CPU점유율)  %MEM   TIME+ COMMAND
+------------------------------------------------------------------------------------------------
+>실행 할 때 옵션
+-d : 실행 주기 설정
+-n : 실행 갱신 횟수 (잘 안씀)
+	
+#top (3초마다)
+PR : 수치가 낮을 수록 우선순위가 높다
+
+# top -d 5  
+5초마다 한번씩 디스플레이 해줌
+
+# top -n 3
+3번만 디스플레이 보여주고 종료
+
+> 실행 후 옵션
+-p : CPU 점유율 순 정렬 출력
+
+======================================================
+04. kill
+>kill명령어는 시그널을 프로세스로 전송하는 명령어다.(64개의 시그널)
+# kill -l
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
+ 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1
+11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM
+16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP
+21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ
+26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR
+31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3
+38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8
+43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13
+48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12
+53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7
+58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2
+63) SIGRTMAX-1	64) SIGRTMAX
+
+>15번 SIGTERM : 정상 종료 (자동으로 모든 시스템 종료, shut down)
+			일반적으로 kill 시그널이 전송되기 전에 전송된다. 
+			잡히는 시그널이기 때문에 종료되는 것을 트랙할 수 있다. 
+>9번 SIGKILL : 강제 종료(무조건적으로 즉시 중지한다.)
+>1번 SIGHUP : hangup 시그널 (전화선 끊어짐)
+>2번 SIGINT : Interrup 시그널(Ctrl +c : 실행을 중지)
+>3번 SIGQUIT : quit 시그널;  Ctrl + \
+>18번 SIGCONT : STOP 시그널 이후 계속 진행할 때 사용. ; 정지 되지 않은 경우 무시됨
+>19번 SIGSTOP : 정지 시그널; SIGSTP과 같으나 잡거나 무시할 수 없음
+>20번 SIGTSTO : 키보드에 의해 발생하는 시그널로 Ctrl+Z로 생성된다. ; 터미널 정지 문자
+
+
+#kill [옵션][PID]
+<옵션>
+-l : 시그널 목록 출력
+
+#ps aux  로 현재 프로세스 상태 확인 후,
+#kill -9 2683 로 bash의 식별자(2683)로 kill하면 bash창 꺼지게 됨
+
+======================================================
+05. killall
+> 여러 프로세스를 한번에 종료
+
+#killall [옵션][프로세스명]
+#killall -9 http //웹서버 한번에 종료
+
+//웹서버 kill시켜보기
+#yum -y install httpd*//웹서버 설치 명령어
+#ps -aux
+#systemctl restart httpd//웹서버로 다시 시작
+#ps -aux
+#killall -9 httpd //apache 서버 모두 kill됨
+#ps aux //킬된것 확인
+
+======================================================
+06. nice
+>프로그램 실행 시 우선순위값 변경(top 실행했을 때 보이는 우선 순위)
+>우선순위값 범위 : -20 ~ 19 (default: 0)
+># nice --10 top : nice값은 -10  # nice --10 top : nice값은 +10
+>우선순위는 숫자가 높을 수록 우선순위가 낮음
+
+#nice [옵션][프로그램]
+
+<옵션>
+-n : 우선순위값 지정
+
+
+//nice 해보기
+top
+36571 root      10   -10  226020   4020   3416 R   0.7   0.2   0:00.10 top
+#nice -10 top
+36571 root      30   10  226020   4020   3416 R   0.7   0.2   0:00.10 top
+
+//실습
+#nice -10 top  //우선 순위를 10 낮춤
+#nice --20 top //우선 순위를 10 올림
+
+======================================================
+07. renice
+>프로그램 실행이 된 상태에서 우선순위값 변경
+
+#nice [옵션][PID]
+
+//renice 해보기
+36571 root      20   0  226020   4020   3416 R   0.7   0.2   0:00.10 top
+
+새창에서 renice해야 함.
+
+[root@localhost ~]# renice -10 36571
+36571 (process ID) old priority 0, new priority -10
+
+36571 root      10   -10  226020   4020   3416 R   0.7   0.2   0:00.10 top
+
+//실습
+#nice 10 top //우선 순위를 10 낮춤
+#nice -10 top  //우선 순위를 10 올림
+
+======================================================
+08. cron 
+>스케줄링 하는 프로그램
+>몇월 몇시 몇초에 프로그램을 실행할지
+>주기적 스케줄러 : cron / 일시적 스케줄러 : at, anacron
+
+
+#crontab [옵션] 
+
+<옵션>
+-l : 스케줄 listing (스케줄 목록 출력)
+-e : 스케줄 edit (스케줄 설정)
+-r : 스케줄 remove(스케줄 삭제)
+
+>스케줄 포맷
+[분][시][일][월][요일][실행할 명령어]
+[분] : 0~59
+[시] : 00 ~23
+[일] : 1 ~31
+[월] : 1 ~12
+[요일] : 0~6(일요일 : 0,7/ 월요일:1/화요일:2...)
+[실행할 명령어]
+--------------------------------
+45 16 * * * /home/cron.sh
+---------------------------------
+
+
+//실습 해보기
+#cd /home   
+#mkdir korea
+#cd korea
+#vi cron.sh
+	vi : cp /etc/passwd /home/korea 이란 내용 vi에 쓰고 저장
+		//etc의 paswd파일을 카피해서 korea에 붙여넣기
+#chmod 777 cron.sh //777의 의미는 user, group, other 모두에게 모든 권한을 준다.
+
+//다른 창으로 와서
+#crontab -e //스케줄 수정
+vi에디터 자동 실행됨
+	vi : 50 16 * * * /home/korea/cron.sh 적고 저장
+		//60분 16시에 * (매일)*(매월)*(매요일) 
+		//  /home/korea/cron.sh에 적힌 내용이 실행되게 함
+
+//다시 cron.sh 파일을 만들었던 창으로와서
+//korea 디렉터리에 16시 50분에 passwd가 카피됐는지 확인
+-rwxrwxrwx. 1 root root   28  3월  2 16:50 cron.sh
+-rw-r--r--. 1 root root 2219  3월  2 16:50 passwd //생성된걸 볼 수 있음
+
+# crontab -l
+50 16 * * * /home/korea/cron.sh  //생성된 스케줄 리스트 출력
+
+
+//실습해보기2 
+//vi 예시
+mkdir /home/korea1
+cp /etc/passwd /home/korea1
+mkdir /home/korea2
+mv /home/korea1/passwd /home/korea2
+touch /home/korea2/file1.txt
+
+======================================================
+======================================================
+[디스크 관리]
+
+======================================================
+01. 디스크 관련 명령어
+1) df
+> 파일 시스템 단위(c,d드라이브같은 장치) 사용량 출력(disc free)
+
+#df [옵션] [장치명]
+
+<옵션>
+-h : human redable
+-k : KB
+-m : MB
+-T : 파일시스템 유형
+-모르겠으면 #man df  #df --help 읽어보기
+
+// #df
+[root@localhost home]# df
+Filesystem          1K-blocks     Used Available Use% Mounted on
+devtmpfs                 4096        0      4096   		0% /dev
+tmpfs                  886868        0    886868   		0% /dev/shm
+tmpfs                  354748     7264    347484   		3% /run
+/dev/mapper/rl-root  38719488  5049096  33670392  14% /
+/dev/nvme0n1p1         983040   307312    675728  	32% /boot
+tmpfs                  177372      100    177272   1% 	/run/user/0
+/dev/sr0             10267282 10267282         0 100% /run/media/root/Rocky-9-3-x86_64-dvd
+
+// #df -h (human-readable)
+[root@localhost home]# df -h
+Filesystem           Size  Used Avail Use% Mounted on
+devtmpfs             4.0M     0  4.0M   0% /dev
+tmpfs                867M     0  867M   0% /dev/shm
+tmpfs                347M  7.1M  340M   3% /run
+/dev/mapper/rl-root   37G  4.9G   33G  14% /
+/dev/nvme0n1p1       960M  301M  660M  32% /boot
+tmpfs                174M  104K  174M   1% /run/user/0
+/dev/sr0             9.8G  9.8G     0 100% /run/media/root/Rocky-9-3-x86_64-dvd
+
+// # df -Th (파일시스템 유형)
+[root@localhost home]# df -Th
+Filesystem          Type      Size  Used Avail Use% Mounted on
+devtmpfs            devtmpfs  4.0M     0  4.0M   0% /dev
+tmpfs               tmpfs     867M     0  867M   0% /dev/shm
+tmpfs               tmpfs     347M  7.1M  340M   3% /run
+/dev/mapper/rl-root xfs        37G  4.9G   33G  14% /
+/dev/nvme0n1p1      xfs       960M  301M  660M  32% /boot
+tmpfs               tmpfs     174M  104K  174M   1% /run/user/0
+/dev/sr0            iso9660   9.8G  9.8G     0 100% /run/media/root/Rocky-9-3-x86_64-dvd
+
+
+2)du
+> 디렉터리 단위로 사용량 출력
+#du [옵션] 
+
+======================================================
+02. 하드디스크 추가
+1) HDD 추가
+-하던 프로그램 종료시키고 init 0
+-디스크 add하기
+
+2) 파티션 나누기 = (윈도우에서 c,d드라이브 나누는 것) = 내땅이다 선언 
+#fdisk [장치명]
+#fdisk -l <--HDD 목록 출력
+#fdisk /dev/nvme0n2
+(n>p>1>2048>enter>w)
+
+3) 파일 시스템 생성  (=윈도우의 포맷) = 내 땅 밭갈기 
+#mkfs_xfs [장치명]
+#mkfs -t ext4 /dev/nvme0n2p1
+
+4) 마운트
+#mount -t [파일시스템 유형][장치명][마운트 포인트]
+#mount -t ext4 /dev/nvme0n2p1 /mnt
+#df
+
+5) 마운트 해제
+#umount [장치명]
+#umount [마운트 포인트]
+
+#umount /dev/nvme0n3p1
+#umount /mnt
+
+6) 자동 마운트
+>관련 파일 : /etc/fstab
+/dev/nvme0n4p1         /mnt                     ext4    defaults        0 0
+
+
+*DISK TYPE(interface)
+1)IDE/EIDE : 20년 전 (디스크 최대 4개)
+2)SCSI : 서버, 스카시 타입 (디스크 최대 16개)
+3)S-ATA : 속도 빠름(대부분의 현재 노트북 디스크)(디스크 최대 127개)
+
+*DISK 장치파일명
+/dev/hd?
+	/dev/hda  -물리적인 하드디스크 갯수
+	/dev/hdc  -물리적인 하드디스크 3개
+/dev/sd?  <-S-ATA디스크타입
+	/dev/sda1 - 물리적인 첫번째 하드디스크의 첫번째 파티션
+			파티션이 하나면 1 ( 안나눈것)
+		(/dev/sda1   | /dev/sda2)
+
+*파티션 종류 : 
+	1)primary partition -기본 파티션 -4개
+	2)extended partition -확장 파티션 -5개를 나누고 싶을때 
+					4개로 나눈것 중 마지막 것을 반으로 나눈것 중 
+					하나를 확장 파티션으로 두고
+	3)logical partition - 논리 파티션
+					그 확장 파티션을 논리 파티션으로 두면
+					5개의 파티션 이용 가능
+
+*마더보드 : CPU + RAM + DISK
+
+
+*리눅스에 연결시키는 것이 Mount  -> /  가 mount하는 기호
+*파일 시스템
+	>종류 : ext, ext2, ext3, ext4, xfs
+	>저널링 기능 : ext3 이상에서 지원해줌
+	>저널링 파일 시스템 : xfs, jfsm reiserfs
+
+
+//파티션 나누는 명령어
+//#fdisk -l
+[root@localhost ~]# fdisk -l
+Disk /dev/nvme0n1: 40 GiB, 42949672960 bytes, 83886080 sectors
+Disk model: VMware Virtual NVMe Disk
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x8e534b83
+
+Device         Boot   Start      End  Sectors Size Id Type
+/dev/nvme0n1p1 *       2048  2099199  2097152   1G 83 Linux
+/dev/nvme0n1p2      2099200 83886079 81786880  39G 8e Linux LVM
+
+
+Disk /dev/nvme0n2: 40 GiB, 42949672960 bytes, 83886080 sectors
+Disk model: VMware Virtual NVMe Disk
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+[root@localhost ~]# fdisk -l
+Disk /dev/nvme0n1: 40 GiB, 42949672960 bytes, 83886080 sectors
+Disk model: VMware Virtual NVMe Disk
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x8e534b83
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

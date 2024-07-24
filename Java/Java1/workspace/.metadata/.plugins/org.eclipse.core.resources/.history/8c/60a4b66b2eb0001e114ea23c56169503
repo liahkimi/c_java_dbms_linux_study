@@ -1,0 +1,46 @@
+package day05;
+
+import java.util.Scanner;
+
+public class Practice {
+
+	public static void main(String[] args) {
+		// 실습1.
+				// 사용자에게 양의 정수 3개를 입력받기(1개씩 입력받는다)
+				// 단, 음수를 입력하였을 경우 음의 정수를 입력하였습니다 출력하고 다시 입력받기
+				// 누적된 양의 정수 개수가 3개가 아니라면 다시 입력받기
+				// 누적된 양의 정수 개수가 3개가 된다면 반복을 종료하고 프로그램 종료 출력하기
+
+				// 1. 사용자에게 정수를 입력받는다
+				// 2. 입력된 정수의 양수 음수 여부를 판별한다
+				// 3. 입력받은 양의 정수 개수를 기억해야한다
+		
+		Scanner sc = new Scanner(System.in);
+		int num = 0;
+		int count = 0;
+		while(count<3){
+			System.out.println("양의정수를 입력해주세요 >>");
+			num=sc.nextInt();
+			if(num<0) {
+				System.out.println("음의 정수를 입력하였습니다.");
+				System.out.println("양의정수를 입력해주세요 >>");
+				num=sc.nextInt();
+				
+			}
+			count++;
+		}
+		System.out.println("프로그램을 종료하였습니다.");
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+
+}
